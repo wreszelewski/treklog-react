@@ -1,0 +1,62 @@
+.ui.dimmer {
+    background-color: rgba(255,255,255,0.1);
+}
+
+.ui.inverted.dimmer {
+    opacity: 1;
+    background-color: rgba(255,255,255,0.3);
+}
+
+.trackMenu {
+    max-height: 100%;
+    background-color: rgba(0,0,0,0.90);
+    border-radius: 5px;
+}
+
+.trackMenu h1 {
+    text-align: center;
+}
+
+#trackListContainer {
+    max-height: 50vh;
+    overflow-y: scroll;
+    text-align: center;
+}
+
+#trackListContainer .header {
+    color: white;
+}
+
+#trackListContainer .item {
+    padding: 20px;
+}
+
+#trackListContainer .item:hover {
+    background-color: rgba(255,255,255, 0.2);
+}
+
+#trackListContainer::-webkit-scrollbar {
+    width: 0.3em;
+}
+ 
+#trackListContainer::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+}
+ 
+#trackListContainer::-webkit-scrollbar-thumb {
+  background-color: darkgrey;
+  outline: 1px solid slategrey;
+}
+
+#trackListContainer .ui.divided.items .item {
+    border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+#trackListContainer .ui.divided.items .item:last-child {
+    padding-bottom: 1.5em!important;
+}
+
+#trackListContainer .ui.divided.items .item:first-child {
+    border-top: 0px;
+    padding-top: 1.5em!important;
+}
