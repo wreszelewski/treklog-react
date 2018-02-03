@@ -1,0 +1,10 @@
+.bottomMenu {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    text-align: center;
+    width: 100%;
+    padding-bottom: 30px;
+    background-color: rgba(0, 0, 0, 0.75);
+    color: white;
+}

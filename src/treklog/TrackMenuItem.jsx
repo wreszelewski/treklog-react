@@ -10,12 +10,14 @@ import {bindActionCreators} from 'redux';
 class TrackMenuItem extends Component {
     
     loadTrack() {
+        this.props.actions.showTreklogLoader();
         this.props.actions.fetchTrackStarted();
         this.props.actions.hideTrackMenu();
         this.getPoints(this.props.track.geoJsonPath)
             .then((geoJsonPoints) => {
                 this.props.track.geoJsonPoints = geoJsonPoints;
                 this.props.actions.fetchTrackFinished(this.props.track);
+                this.props.actions.hideTreklogLoader();
             });
     }
 

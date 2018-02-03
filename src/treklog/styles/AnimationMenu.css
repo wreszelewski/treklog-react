@@ -1,0 +1,99 @@
+#animationMenu {
+    background-color: transparent;
+    text-align: right;
+    padding: 0;
+}
+
+.ui.progress:first-child {
+    margin: 0;
+}
+
+#animationMenu .ui.buttons {
+    margin: 0;
+    float: left;
+}
+
+.ui.progress .bar {
+    background: white;
+    min-width: 3px;
+    height: 31px;
+}
+
+.movieMenu {
+    background-color: rgba(0,0,0, 0.7)
+}
+
+.movieMenu .ui.progress {
+    margin: 0 0  0 149px;
+    cursor: pointer;
+}
+
+.ui.progress .bar>.progress {
+    color: grey;
+    right: auto;
+    left: 1.5em;
+}
+
+#mouseLabel {
+    top: -2em;
+    position: absolute;
+    left: 330px;
+    white-space: nowrap;
+    background-color: rgba(0,0,0,0.7);
+    padding: 5px;
+    border-radius: 5px;
+    display: none;
+}
+
+.movieMenu-btn:hover {
+    background-color: white;
+    color: rgba(0,0,0,0.85);
+}
+
+.ui.button.descriptionExpander {
+    float: right;
+    margin-right: 20px;
+    margin-top: 10px;
+}
+
+.ui.inverted.menu.menuButtons {
+    width: 150px;
+    float: left;
+    background-color: transparent;
+    border-radius: 0;
+    margin: 0;
+}
+
+.ui.inverted.menu.menuButtons .item {
+    border-radius: 0;
+}
+
+.ui.inverted.menu.menuButtons .item:hover {
+    background-color: rgba(255,255,255, 0.5);
+}
+
+.movieOptions {
+    min-width: fit-content;
+    text-align: center;
+}
+
+.ui.menu .dropdown.item .menu.movieOptions {
+    background-color: #000;
+    border-radius: 3px;
+}
+
+.movieOptions .field {
+    text-align: center;
+}
+
+.ui.form .inline.field>input.number {
+    width: 7em;
+}
+
+.ui.form .field>label.unit {
+    margin-left: 5px;
+}
+
+.ui.pointing.dropdown>.menu.movieOptions:after {
+    background-color: inherit;
+}

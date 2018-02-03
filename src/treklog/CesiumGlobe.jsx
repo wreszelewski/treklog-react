@@ -12,7 +12,7 @@ import CzmlDataSource from "cesium/Source/DataSources/CzmlDataSource"
 import { connect } from 'react-redux'
 import czml from "./helpers/czml"
 import cameraPosition from "./helpers/cameraPosition";
-
+import './styles/CesiumGlobe.css'
 
 class CesiumGlobe extends Component {
     state = {
@@ -38,7 +38,8 @@ class CesiumGlobe extends Component {
                 imageryProviderViewModels: this.getImageryProviders(),
                 terrainProviderViewModels: [],
                 terrainExaggeration: 2.0,
-                fullscreenButton: false
+                fullscreenButton: false,
+                creditContainer: 'cesiumAttribution'
             });
     
             this.viewer.terrainProvider = new CesiumTerrainProvider({
