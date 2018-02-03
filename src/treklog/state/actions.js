@@ -7,6 +7,11 @@ export const HIDE_TRACK_MENU = 'HIDE_TRACK_MENU';
 export const SHOW_TREKLOG_LOADER = 'SHOW_TREKLOG_LOADER';
 export const HIDE_TREKLOG_LOADER = 'HIDE_TREKLOG_LOADER';
 
+export const ANIMATION_PLAY = 'ANIMATION_PLAY';
+export const ANIMATION_PAUSE = 'ANIMATION_PAUSE';
+export const ANIMATION_STOP = 'ANIMATION_STOP';
+export const ANIMATION_SET_SPEED = 'ANIMATION_SET_SPEED';
+
 export function fetchTrackStarted() {
   return { type: FETCH_TRACK_STARTED }
 }
@@ -29,4 +34,20 @@ export function showTreklogLoader() {
 
 export function hideTreklogLoader() {
   return { type: HIDE_TREKLOG_LOADER };
+}
+
+export function animationPlay() {
+  return { type: ANIMATION_PLAY };
+}
+
+export function animationPause() {
+  return { type: ANIMATION_PAUSE };
+}
+
+export function animationStop() {
+  return { type: ANIMATION_STOP };
+}
+
+export function animationSetSpeed(speed) {
+  return { type: ANIMATION_SET_SPEED, speed };
 }

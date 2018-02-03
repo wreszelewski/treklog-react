@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import AnimationMenu from './AnimationMenu';
+import AnimationMenuContainer from './AnimationMenuContainer';
 import TrackDescriptionContainer from './TrackDescriptionContainer';
 
 import './styles/BottomMenu.css';
@@ -11,7 +11,7 @@ export default class BottomMenu extends Component {
           return (    
             
               <div className="bottomMenu">
-                  <AnimationMenu />
+                  <AnimationMenuContainer />
                   <TrackDescriptionContainer />
               </div>
             

@@ -13,10 +13,15 @@ import { connect } from 'react-redux'
 import czml from "./helpers/czml"
 import cameraPosition from "./helpers/cameraPosition";
 import './styles/CesiumGlobe.css'
+import AnimationController from './helpers/AnimationController'
 
 class CesiumGlobe extends Component {
     state = {
         viewerLoaded : false,
+        isPlaying: false,
+        animationInitialized: false,
+        animation: null,
+        animationSpeed: 300
     }
 
     componentDidMount() {
@@ -41,6 +46,7 @@ class CesiumGlobe extends Component {
                 fullscreenButton: false,
                 creditContainer: 'cesiumAttribution'
             });
+            this.state.animation = new AnimationController(this.viewer);
     
             this.viewer.terrainProvider = new CesiumTerrainProvider({
                 url: 'https://assets.agi.com/stk-terrain/world',
@@ -106,6 +112,23 @@ class CesiumGlobe extends Component {
             this.loadTrack(nextProps.track);
             console.log(nextProps);
         }
+        console.log(this.state.animation);
+        if(this.state.animation) {
+            if(this.state.animationInitialized && !nextProps.animation.shouldBeInitialized) {
+                this.state.animation.stop();
+            }
+            if(!this.state.isPlaying && nextProps.animation.shouldPlay) {
+                this.state.animation.play();
+            }
+            if(this.state.isPlaying && !nextProps.animation.shouldPlay) {
+                this.state.animation.pause();
+            }
+            if(this.state.animationSpeed !== nextProps.animation.speed) {
+                this.state.animation.setSpeed(nextProps.animation.speed);
+            }
+
+        }
+
     }
 
     componentWillUnmount() {
@@ -190,7 +213,8 @@ class CesiumGlobe extends Component {
 
 const mapStateToProps = state => {
     return {
-      track: state.track
+      track: state.track,
+      animation: state.animation
     }
   }
 

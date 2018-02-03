@@ -9,18 +9,19 @@ export default class AnimationMenu extends Component {
     }
 
     render() {
+            console.log(this.props.actions);
             return (    
             
                 <Segment id="animationMenu" inverted>
                 <div className="movieMenu">
                         <Menu size="mini" inverted icon borderless className="menuButtons">
-                            <Menu.Item name='play' onClick={this.handleItemClick}>
+                            <Menu.Item name='play' onClick={this.props.actions.animationPlay}>
                                 <Icon name='play' />
                             </Menu.Item>
-                            <Menu.Item name='pause' onClick={this.handleItemClick}>
+                            <Menu.Item name='pause' onClick={this.props.actions.animationPause}>
                                 <Icon name='pause' />
                             </Menu.Item>
-                            <Menu.Item name='stop' onClick={this.handleItemClick}>
+                            <Menu.Item name='stop' onClick={this.props.actions.animationStop}>
                                 <Icon name='stop' />
                             </Menu.Item>
                                 <Dropdown icon="setting" pointing className="bottom left icon item">
