@@ -53,7 +53,7 @@ class CesiumGlobe extends Component {
                 requestWaterMask: false,
                 requestVertexNormals: false
             });
-    
+            this.viewer.clock.shouldAnimate = false;
             this.viewer.scene.globe.depthTestAgainstTerrain = true;
         }
 
@@ -86,6 +86,7 @@ class CesiumGlobe extends Component {
         }).then(([addGeoJson, addCzml]) => {
             addCzml.show = false;
             console.log("HERE2");
+            this.state.animation.initialize(track);
             if(track.initialPosition.position) {
                  const destination = cameraPosition.getDestination(track);
                  const orientation = cameraPosition.getOrientation(track);
@@ -110,22 +111,31 @@ class CesiumGlobe extends Component {
     componentWillReceiveProps(nextProps) {
         if(this.props.track !== nextProps.track) {
             this.loadTrack(nextProps.track);
-            console.log(nextProps);
         }
-        console.log(this.state.animation);
+        console.log(nextProps);
+        console.log(this.state);
         if(this.state.animation) {
-            if(this.state.animationInitialized && !nextProps.animation.shouldBeInitialized) {
+            console.log(nextProps.animation);
+            if(this.state.animation.animationInitialized && nextProps.animation.reset) {
+                console.log("RESET");
+                this.state.animation.reset();
+            }
+            if(this.state.animation.animationInitialized && !nextProps.animation.shouldBeInitialized) {
                 this.state.animation.stop();
             }
-            if(!this.state.isPlaying && nextProps.animation.shouldPlay) {
+            if(!this.viewer.clock.shouldAnimate && nextProps.animation.shouldPlay) {
                 this.state.animation.play();
             }
-            if(this.state.isPlaying && !nextProps.animation.shouldPlay) {
+            if(this.viewer.clock.shouldAnimate && !nextProps.animation.shouldPlay) {
+                console.log("PAUSE");
                 this.state.animation.pause();
             }
             if(this.state.animationSpeed !== nextProps.animation.speed) {
                 this.state.animation.setSpeed(nextProps.animation.speed);
+                this.setState(Object.assign({}, this.state, {animationSpeed: nextProps.animation.speed}));
+
             }
+            
 
         }
 
@@ -211,7 +221,7 @@ class CesiumGlobe extends Component {
 
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
     return {
       track: state.track,
       animation: state.animation

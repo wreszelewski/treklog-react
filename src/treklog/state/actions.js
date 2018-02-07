@@ -1,6 +1,8 @@
 export const FETCH_TRACK_STARTED = 'FETCH_TRACK_STARTED';
 export const FETCH_TRACK_FINISHED = 'FETCH_TRACK_FINISHED';
 
+export const FETCH_TRACKS_FINISHED = 'FETCH_TRACKS_FINISHED';
+
 export const SHOW_TRACK_MENU = 'SHOW_TRACK_MENU';
 export const HIDE_TRACK_MENU = 'HIDE_TRACK_MENU';
 
@@ -10,6 +12,7 @@ export const HIDE_TREKLOG_LOADER = 'HIDE_TREKLOG_LOADER';
 export const ANIMATION_PLAY = 'ANIMATION_PLAY';
 export const ANIMATION_PAUSE = 'ANIMATION_PAUSE';
 export const ANIMATION_STOP = 'ANIMATION_STOP';
+export const ANIMATION_RESET = 'ANIMATION_RESET';
 export const ANIMATION_SET_SPEED = 'ANIMATION_SET_SPEED';
 
 export function fetchTrackStarted() {
@@ -18,6 +21,10 @@ export function fetchTrackStarted() {
 
 export function fetchTrackFinished(track) {
     return { type: FETCH_TRACK_FINISHED, track}
+}
+
+export function fetchTracksFinished(tracks) {
+  return { type: FETCH_TRACKS_FINISHED, tracks}
 }
 
 export function showTrackMenu() {
@@ -46,6 +53,10 @@ export function animationPause() {
 
 export function animationStop() {
   return { type: ANIMATION_STOP };
+}
+
+export function animationReset() {
+  return { type: ANIMATION_RESET };
 }
 
 export function animationSetSpeed(speed) {

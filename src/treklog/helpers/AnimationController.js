@@ -23,8 +23,10 @@ export default class AnimationController {
 
     initialize(track) {
         this.viewer.clock.clockRange = ClockRange.CLAMPED;
+        this.viewer.clock.shouldAnimate = false;
         this.viewer.clock.currentTime = this.viewer.clock.startTime;
         this.secondsDuration = JulianDate.secondsDifference(this.viewer.clock.stopTime, this.viewer.clock.startTime);
+        console.log(this.secondsDuration);
         const dataSource = this.viewer.dataSources.get(1)
         this.lastPosition = dataSource.entities.getById('path').position.getValue(this.viewer.clock.currentTime);
         this.initialDestination = cameraPosition.getDestination(track);
@@ -48,8 +50,9 @@ export default class AnimationController {
     }
 
     start(fly = true) {
-        return Promise.resolve().then(() => {
-            if(!this.animationInitialized) {
+
+        if(!this.animationInitialized) {
+            return Promise.resolve().then(() => {
                 this.viewer.dataSources.get(0).show = false;
                 this.viewer.dataSources.get(1).show = true;
                 const track = this.viewer.dataSources.get(1);
@@ -58,20 +61,21 @@ export default class AnimationController {
                 if(fly) {
                     this.viewer.flyTo(track.entities.getById('path'));
                 }
+            }).then(() => {
                 this.animationInitialized = true;
                 return new Promise(resolve => {
                     setTimeout(() => {
-                        this.viewer.trackedEntity = track.entities.getById('path');
+                        this.viewer.trackedEntity = this.viewer.dataSources.get(1).entities.getById('path');
                         this.backward = 0;
                         setTimeout(() => {
                             resolve();
                         }, 2000);                                        
                     }, 3200);
                 });
-            } else {
-                return Promise.resolve();
-            }
-        });
+            });
+        } else {
+            return Promise.resolve();
+        }
     }
 
     play() {
