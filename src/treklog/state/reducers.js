@@ -25,7 +25,8 @@ const initialState = {
       shouldPlay: false,
       shouldBeInitialized: false,
       reset: false,
-      speed: 300
+      speed: 300,
+      currentTime: 0
   }
 }
 
@@ -46,15 +47,15 @@ function reducer(state = initialState, action) {
     case HIDE_TREKLOG_LOADER:
         return Object.assign({}, state, {showLoader: false});
     case ANIMATION_PLAY:
-        return Object.assign({}, state, {animation: {reset: false, shouldPlay: true, shouldBeInitialized: true, speed: state.animation.speed}});
+        return Object.assign({}, state, {animation: {reset: false, shouldPlay: true, shouldBeInitialized: true, speed: state.animation.speed, currentTime: 0}});
     case ANIMATION_PAUSE:
-        return Object.assign({}, state, {animation: {shouldPlay: false, shouldBeInitialized: true, speed: state.animation.speed}});
+        return Object.assign({}, state, {animation: {shouldPlay: false, shouldBeInitialized: true, speed: state.animation.speed, currentTime: 0}});
     case ANIMATION_STOP:
-        return Object.assign({}, state, {animation: {shouldPlay: false, shouldBeInitialized: false, speed: state.animation.speed}});
+        return Object.assign({}, state, {animation: {shouldPlay: false, shouldBeInitialized: false, speed: state.animation.speed, currentTime: 0}});
     case ANIMATION_RESET:
-        return Object.assign({}, state, {animation: {reset: true, shouldPlay: false, shouldBeInitialized: false, speed: state.animation.speed}});
+        return Object.assign({}, state, {animation: {reset: true, shouldPlay: false, shouldBeInitialized: false, speed: state.animation.speed, currentTime: 0}});
     case ANIMATION_SET_SPEED:
-        return Object.assign({}, state, {animation: {shouldPlay: state.animation.shouldPlay, shouldBeInitialized: state.animation.shouldBeInitialized, speed: parseInt(action.speed)}})
+        return Object.assign({}, state, {animation: {shouldPlay: state.animation.shouldPlay, shouldBeInitialized: state.animation.shouldBeInitialized, speed: parseInt(action.speed), currentTime: 0}})
     default:
       return state
   }

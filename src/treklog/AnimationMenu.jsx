@@ -1,5 +1,6 @@
 import React, {Component} from 'react'
 import { Segment, Menu, Icon, Dropdown } from 'semantic-ui-react'
+import AnimationProgress from './AnimationProgress';
 import './styles/AnimationMenu.css';
 
 export default class AnimationMenu extends Component {
@@ -39,12 +40,7 @@ export default class AnimationMenu extends Component {
                                     </Dropdown.Menu>
                                 </Dropdown>
                         </Menu>
-                <div id="animationProgress" className="ui white progress">
-                        <div id="animationProgressBar" className="bar">
-                                <div className="progress"></div>
-                                <div id="mouseLabel"></div>
-                        </div>
-                    </div>
+                    <AnimationProgress track={this.props.track} animation={this.props.animation}/>
                     </div>
                     </Segment>
                     
