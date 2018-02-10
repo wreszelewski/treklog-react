@@ -6,7 +6,7 @@ import CMath from "cesium/Source/Core/Math"
 import Cartesian3 from "cesium/Source/Core/Cartesian3"
 
 export default class AnimationController {
-    constructor(viewer) {
+    constructor(viewer, actions) {
         this.viewer = viewer;
         this.animationInitialized = false;
         this.headings = [];
@@ -19,6 +19,7 @@ export default class AnimationController {
         this.initialOrientation;
         this.initialDestination;
         this.secondsDuration = 0;
+        this.actions = actions;
     }
 
     initialize(track) {
@@ -31,8 +32,6 @@ export default class AnimationController {
         this.lastPosition = dataSource.entities.getById('path').position.getValue(this.viewer.clock.currentTime);
         this.initialDestination = cameraPosition.getDestination(track);
         this.initialOrientation = cameraPosition.getOrientation(track);
-        //this.animationProgress.setDuration(this.secondsDuration);
-        //this.animationProgress.initializeAnimationProgress();
     }
 
     reset() {
@@ -127,7 +126,7 @@ export default class AnimationController {
             this.viewer.camera.moveBackward(100);
             this.backward += 100;
         }
-        //this.animationProgress.updateAnimationProgress();        
+        this.actions.updateAnimationProgress(JulianDate.secondsDifference(this.viewer.clock.currentTime, this.viewer.clock.startTime));        
     }
 
     _headingRotation(track) {

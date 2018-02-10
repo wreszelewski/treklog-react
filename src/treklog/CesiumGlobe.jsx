@@ -14,6 +14,8 @@ import czml from "./helpers/czml"
 import cameraPosition from "./helpers/cameraPosition";
 import './styles/CesiumGlobe.css'
 import AnimationController from './helpers/AnimationController'
+import {bindActionCreators} from 'redux';  
+import * as treklogActions from "./state/actions";
 
 class CesiumGlobe extends Component {
     state = {
@@ -46,7 +48,7 @@ class CesiumGlobe extends Component {
                 fullscreenButton: false,
                 creditContainer: 'cesiumAttribution'
             });
-            this.state.animation = new AnimationController(this.viewer);
+            this.state.animation = new AnimationController(this.viewer, this.props.actions);
     
             this.viewer.terrainProvider = new CesiumTerrainProvider({
                 url: 'https://assets.agi.com/stk-terrain/world',
@@ -228,4 +230,8 @@ const mapStateToProps = (state) => {
     }
   }
 
-export default connect(mapStateToProps, undefined)(CesiumGlobe);
+  function mapDispatchToProps(dispatch) {  
+    return {actions: bindActionCreators(treklogActions, dispatch)};
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(CesiumGlobe);

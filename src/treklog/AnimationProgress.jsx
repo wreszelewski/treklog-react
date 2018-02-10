@@ -39,24 +39,25 @@ export default class AnimationProgress extends Component {
     }
 
     componentDidMount() {
-        ReactDOM.findDOMNode(this.refs['animationProgress']).children[0].children[0].innerHTML = 'A';
+        ReactDOM.findDOMNode(this.refs['animationProgress']).children[0].children[0].innerHTML = formatSeconds(this.props.animation.currentTime);
     }
 
     componentDidUpdate() {
-        ReactDOM.findDOMNode(this.refs['animationProgress']).children[0].children[0].innerHTML = 'A';
+        console.log(this.props.animation);
+        ReactDOM.findDOMNode(this.refs['animationProgress']).children[0].children[0].innerHTML = formatSeconds(this.props.animation.currentTime);
     }
 
     render() {
         console.log(this.state);
         if(this.state.showMouseLabel) {
             return (    
-                <Progress ref="animationProgress" total={this.props.track.duration / 1000} value={300} active={false} precision={10} autoSuccess={false} className="white" onMouseMove={e => this.showMouseLabel(e)} onMouseLeave={e => this.hideMouseLabel(e)} progress>
+                <Progress ref="animationProgress" total={this.props.track.duration / 1000} value={this.props.animation.currentTime} active={false} precision={10} autoSuccess={false} className="white" onMouseMove={e => this.showMouseLabel(e)} onMouseLeave={e => this.hideMouseLabel(e)} progress>
                         <div id="mouseLabel" style={{left: this.state.leftPosition}}>{this.state.labelText}</div>
                 </Progress>
             );
         } else {
             return (    
-                <Progress ref="animationProgress" percent={35} active={false} precision={10} autoSuccess={false} className="white" onMouseMove={e => this.showMouseLabel(e)} onMouseLeave={e => this.hideMouseLabel(e)} progress/>
+                <Progress ref="animationProgress" total={this.props.track.duration / 1000} value={this.props.animation.currentTime} active={false} precision={10} autoSuccess={false} className="white" onMouseMove={e => this.showMouseLabel(e)} onMouseLeave={e => this.hideMouseLabel(e)} progress />
             );
         }
     }

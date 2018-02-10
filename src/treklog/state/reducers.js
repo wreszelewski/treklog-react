@@ -10,7 +10,8 @@ import {
   ANIMATION_PAUSE,
   ANIMATION_STOP,
   ANIMATION_RESET,
-  ANIMATION_SET_SPEED
+  ANIMATION_SET_SPEED,
+  UPDATE_ANIMATION_PROGRESS
 } from './actions'
 
 import _ from 'lodash';
@@ -56,6 +57,8 @@ function reducer(state = initialState, action) {
         return Object.assign({}, state, {animation: {reset: true, shouldPlay: false, shouldBeInitialized: false, speed: state.animation.speed, currentTime: 0}});
     case ANIMATION_SET_SPEED:
         return Object.assign({}, state, {animation: {shouldPlay: state.animation.shouldPlay, shouldBeInitialized: state.animation.shouldBeInitialized, speed: parseInt(action.speed), currentTime: 0}})
+    case UPDATE_ANIMATION_PROGRESS:
+        return Object.assign({}, state, {animation: Object.assign({}, state.animation, {currentTime: action.currentTime})});
     default:
       return state
   }
