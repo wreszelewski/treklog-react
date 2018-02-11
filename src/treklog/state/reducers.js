@@ -11,7 +11,8 @@ import {
   ANIMATION_STOP,
   ANIMATION_RESET,
   ANIMATION_SET_SPEED,
-  UPDATE_ANIMATION_PROGRESS
+  UPDATE_ANIMATION_PROGRESS,
+  ANIMATION_PROGRESS_SET_TIME
 } from './actions'
 
 import _ from 'lodash';
@@ -24,10 +25,12 @@ const initialState = {
   tracks: {},
   animation: {
       shouldPlay: false,
+      shouldReplay: false,
       shouldBeInitialized: false,
       reset: false,
       speed: 300,
-      currentTime: 0
+      currentTime: 0,
+      newTime: null
   }
 }
 
@@ -48,7 +51,7 @@ function reducer(state = initialState, action) {
     case HIDE_TREKLOG_LOADER:
         return Object.assign({}, state, {showLoader: false});
     case ANIMATION_PLAY:
-        return Object.assign({}, state, {animation: {reset: false, shouldPlay: true, shouldBeInitialized: true, speed: state.animation.speed, currentTime: 0}});
+        return Object.assign({}, state, {animation: {reset: false, shouldPlay: true, shouldReplay: true, shouldBeInitialized: true, speed: state.animation.speed, currentTime: 0}});
     case ANIMATION_PAUSE:
         return Object.assign({}, state, {animation: {shouldPlay: false, shouldBeInitialized: true, speed: state.animation.speed, currentTime: 0}});
     case ANIMATION_STOP:
@@ -58,7 +61,13 @@ function reducer(state = initialState, action) {
     case ANIMATION_SET_SPEED:
         return Object.assign({}, state, {animation: {shouldPlay: state.animation.shouldPlay, shouldBeInitialized: state.animation.shouldBeInitialized, speed: parseInt(action.speed), currentTime: 0}})
     case UPDATE_ANIMATION_PROGRESS:
-        return Object.assign({}, state, {animation: Object.assign({}, state.animation, {currentTime: action.currentTime})});
+        return Object.assign({}, state, {animation: Object.assign({}, state.animation, {currentTime: action.currentTime,  newTime: null, shouldReplay: false})});
+    case ANIMATION_PROGRESS_SET_TIME:
+        if(Math.abs(state.animation.currentTime - action.newTime) > 2) {
+            return Object.assign({}, state, {animation: Object.assign({}, state.animation, {newTime: action.newTime})});
+        } else {
+            return state;
+        }
     default:
       return state
   }

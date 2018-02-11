@@ -21,7 +21,6 @@ export default class TrackMenu extends Component {
 
     componentDidMount() {
         getTracks().then((tracks) => {
-            console.log(tracks);
             this.setState(Object.assign({}, this.state, { tracks }));
             this.props.actions.fetchTracksFinished(tracks);
             this.props.actions.hideTreklogLoader();

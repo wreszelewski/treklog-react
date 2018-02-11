@@ -16,6 +16,7 @@ export const ANIMATION_RESET = 'ANIMATION_RESET';
 export const ANIMATION_SET_SPEED = 'ANIMATION_SET_SPEED';
 
 export const UPDATE_ANIMATION_PROGRESS = 'UPDATE_ANIMATION_PROGRESS';
+export const ANIMATION_PROGRESS_SET_TIME = 'ANIMATION_PROGRESS_SET_TIME';
 
 export function fetchTrackStarted() {
   return { type: FETCH_TRACK_STARTED }
@@ -67,4 +68,8 @@ export function animationSetSpeed(speed) {
 
 export function updateAnimationProgress(currentTime) {
   return { type: UPDATE_ANIMATION_PROGRESS, currentTime};
+}
+
+export function animationProgressSetTime(newTime) {
+  return { type: ANIMATION_PROGRESS_SET_TIME, newTime};
 }

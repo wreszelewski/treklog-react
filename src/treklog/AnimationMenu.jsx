@@ -5,12 +5,20 @@ import './styles/AnimationMenu.css';
 
 export default class AnimationMenu extends Component {
 
-    handleItemClick() {
-        return;
+    state = {
+        speed: 300,
+        showSettings: false
     }
 
+    saveSettings() {
+        this.setState(Object.assign({}, this.state, {showSettings: false}));
+        console.log(this.state);
+        this.props.actions.animationSetSpeed(this.state.speed);
+    }
+
+    
+
     render() {
-            console.log(this.props.actions);
             return (    
             
                 <Segment id="animationMenu" inverted>
@@ -25,26 +33,26 @@ export default class AnimationMenu extends Component {
                             <Menu.Item name='stop' onClick={this.props.actions.animationStop}>
                                 <Icon name='stop' />
                             </Menu.Item>
-                                <Dropdown icon="setting" pointing className="bottom left icon item">
+                                <Dropdown icon="setting" pointing className="bottom left icon item" open={this.state.showSettings} onClick={() => this.setState(Object.assign({}, this.state, {showSettings: true}))}>
                                     <Dropdown.Menu className="ui movieOptions">
-                                        <Dropdown.Item className="ui inverted form">
+                                        <Dropdown.Item className="ui inverted form" onClick={() => true}>
                                             <div className="inline field">
                                                 <label>Szybkość</label>
-                                                <input id="speed" className="number" type="number" defaultValue="300" step="100" />
+                                                <input id="speed" className="number" type="number" defaultValue={this.state.speed} step="100" onChange={e => {this.setState(Object.assign({}, this.state, {speed: e.target.value }))}}/>
                                                 <label className="unit">[x]</label>
                                             </div>
                                             <div className="field">
-                                                <button id="saveSettings" className="ui mini inverted button">Zapisz</button>
+                                                <button id="saveSettings" className="ui mini inverted button" onClick={e => {this.saveSettings(); e.stopPropagation();}}>Zapisz</button>
                                             </div>
                                         </Dropdown.Item>
                                     </Dropdown.Menu>
                                 </Dropdown>
                         </Menu>
-                    <AnimationProgress track={this.props.track} animation={this.props.animation}/>
+                    <AnimationProgress track={this.props.track} animation={this.props.animation} actions={this.props.actions}/>
                     </div>
                     </Segment>
                     
             
             );
     }
-}
+}500

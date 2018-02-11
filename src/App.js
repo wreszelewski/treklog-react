@@ -46,7 +46,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 function mapStateToProps(state, ownProps) {  
-    console.log(state);
     return {
         tracks: state.tracks
     };

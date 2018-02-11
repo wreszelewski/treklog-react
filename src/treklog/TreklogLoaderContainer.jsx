@@ -6,7 +6,6 @@ import * as treklogActions from "./state/actions";
 
 
 const mapStateToProps = (state, ownProps) => {
-    console.log(state);
     return {
       active: state.showLoader 
     }

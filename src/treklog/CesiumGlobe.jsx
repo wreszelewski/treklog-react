@@ -16,6 +16,8 @@ import './styles/CesiumGlobe.css'
 import AnimationController from './helpers/AnimationController'
 import {bindActionCreators} from 'redux';  
 import * as treklogActions from "./state/actions";
+import JulianDate from "cesium/Source/Core/JulianDate"
+
 
 class CesiumGlobe extends Component {
     state = {
@@ -114,10 +116,7 @@ class CesiumGlobe extends Component {
         if(this.props.track !== nextProps.track) {
             this.loadTrack(nextProps.track);
         }
-        console.log(nextProps);
-        console.log(this.state);
         if(this.state.animation) {
-            console.log(nextProps.animation);
             if(this.state.animation.animationInitialized && nextProps.animation.reset) {
                 console.log("RESET");
                 this.state.animation.reset();
@@ -125,17 +124,24 @@ class CesiumGlobe extends Component {
             if(this.state.animation.animationInitialized && !nextProps.animation.shouldBeInitialized) {
                 this.state.animation.stop();
             }
-            if(!this.viewer.clock.shouldAnimate && nextProps.animation.shouldPlay) {
+            if(!this.viewer.clock.shouldAnimate && nextProps.animation.shouldPlay && nextProps.animation.shouldReplay) {
                 this.state.animation.play();
             }
             if(this.viewer.clock.shouldAnimate && !nextProps.animation.shouldPlay) {
                 console.log("PAUSE");
                 this.state.animation.pause();
             }
-            if(this.state.animationSpeed !== nextProps.animation.speed) {
+            if(this.viewer.clock.multiplier !== nextProps.animation.speed) {
                 this.state.animation.setSpeed(nextProps.animation.speed);
-                this.setState(Object.assign({}, this.state, {animationSpeed: nextProps.animation.speed}));
+                console.log(this.viewer.clock.multiplier);
 
+            }
+
+            if(nextProps.animation.newTime) {
+                console.log("TEST SET TIME");
+                console.log(this.viewer.clock.currentTime);
+                this.viewer.clock.currentTime = JulianDate.addSeconds(this.viewer.clock.startTime, nextProps.animation.newTime, new JulianDate());
+                console.log(this.viewer.clock.currentTime);
             }
             
 
@@ -178,7 +184,6 @@ class CesiumGlobe extends Component {
     }
 
     getImageryProviders(config) {
-        console.log("Render");
         let imageryProviders = [];
 
         imageryProviders.push(new ProviderViewModel({
