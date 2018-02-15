@@ -2,14 +2,9 @@ import React, {Component} from 'react'
 import { Progress } from 'semantic-ui-react'
 import {formatSeconds} from './helpers/time';
 import ReactDOM from 'react-dom';
-import JulianDate from "cesium/Source/Core/JulianDate"
 
 
 export default class AnimationProgress extends Component {
-
-    handleItemClick() {
-        return;
-    }
 
     state = {
         showMouseLabel: false,
@@ -25,7 +20,6 @@ export default class AnimationProgress extends Component {
     }
 
     hideMouseLabel() {
-        console.log("HIDE");
         this.setState({showMouseLabel: false});
     }
 
@@ -39,7 +33,6 @@ export default class AnimationProgress extends Component {
     }
 
     setTimeFromAnimationProgress(e) {
-        console.log(this.props.actions);
         this.props.actions.animationProgressSetTime(this.getTimeFromAnimationProgress(e));
     }
 

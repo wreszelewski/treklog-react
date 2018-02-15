@@ -1,11 +1,4 @@
-import React, {Component} from "react";
-import firebase from "firebase";
-import config from "../config";
-import moment from "moment";
 import './styles/TrackMenu.css';
-import {Modal,Button} from 'semantic-ui-react';
-import Moment from 'react-moment';
-import 'moment/locale/pl';
 import TrackMenu from './TrackMenu';
 import { connect } from 'react-redux';
 import {bindActionCreators} from 'redux';  

@@ -1,4 +1,3 @@
-import React, {Component} from "react";
 import TrackDescription from './TrackDescription';
 import { connect } from 'react-redux';
 import {bindActionCreators} from 'redux';  

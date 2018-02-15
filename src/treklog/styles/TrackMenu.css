@@ -1,5 +1,5 @@
 .ui.dimmer {
-    background-color: rgba(255,255,255,0.1);
+    background-color: rgba(255,255,255,0.3);
 }
 
 .ui.inverted.dimmer {
@@ -7,10 +7,19 @@
     background-color: rgba(255,255,255,0.3);
 }
 
-.trackMenu {
+.ui.basic.modal .trackMenu {
     max-height: 100%;
     background-color: rgba(0,0,0,0.90);
     border-radius: 5px;
+    width: 540px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@media only screen and (max-width: 767px) {
+    .ui.basic.modal .trackMenu {
+        width: 95%;
+    }
 }
 
 .trackMenu h1 {
@@ -23,12 +32,23 @@
     text-align: center;
 }
 
+@media only screen and (max-width: 767px) {
+    #trackListContainer {
+        max-height: 70vh;
+    }
+}
+
 #trackListContainer .header {
     color: white;
+    font-size: 1.3em;
+    font-weight: 700;
 }
 
 #trackListContainer .item {
     padding: 20px;
+    text-align: center;
+    color: white;
+    display: block;
 }
 
 #trackListContainer .item:hover {

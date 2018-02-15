@@ -1,7 +1,7 @@
 .trackDescription {
     text-align: center;
-    width: 90%;
-    margin: 0 5%;
+    width: 95%;
+    margin: 0 2.5%;
 }
 
 .trackDescription h1 {
@@ -57,8 +57,3 @@
 .ui.inverted.menu.menuButtons .item:hover {
     background-color: rgba(255,255,255, 0.5);
 }
-@media (max-width: 700px) {
-    #trackDescription {
-        display: none;
-    }
-  }

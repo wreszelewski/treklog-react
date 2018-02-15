@@ -16,15 +16,14 @@ export default class AnimationController {
         this.angleApplied = 0;
         this.backward = 5000;
         this.removeEventListener = null;
-        this.initialOrientation;
-        this.initialDestination;
+        this.initialOrientation = null;
+        this.initialDestination = null;
         this.secondsDuration = 0;
         this.actions = actions;
     }
 
     initialize(track) {
         this.viewer.clock.clockRange = ClockRange.CLAMPED;
-        console.log(ClockRange);
         this.viewer.clock.shouldAnimate = false;
         this.viewer.clock.currentTime = this.viewer.clock.startTime;
         this.secondsDuration = JulianDate.secondsDifference(this.viewer.clock.stopTime, this.viewer.clock.startTime);
@@ -32,8 +31,6 @@ export default class AnimationController {
         this.lastPosition = dataSource.entities.getById('path').position.getValue(this.viewer.clock.currentTime);
         this.initialDestination = cameraPosition.getDestination(track);
         this.initialOrientation = cameraPosition.getOrientation(track);
-        console.log("ANIMATION INIT");
-        console.log(this.viewer.clock.shouldAnimate);
     }
 
     reset() {
@@ -47,13 +44,10 @@ export default class AnimationController {
         this.lastHeading = 0;
         this.headings = [];
         this.animationInitialized = false;
-        //this.animationProgress.initializeAnimationProgress();
     }
 
     start(fly = true) {
-        console.log(this.viewer.clock.shouldAnimate);
         if(!this.animationInitialized) {
-            console.log("INITIALIZE");
             return Promise.resolve().then(() => {
                 this.viewer.dataSources.get(0).show = false;
                 this.viewer.dataSources.get(1).show = true;
@@ -69,6 +63,7 @@ export default class AnimationController {
                         this.animationInitialized = true;
                         this.viewer.trackedEntity = this.viewer.dataSources.get(1).entities.getById('path');
                         this.backward = 0;
+                        this.viewer.clock.currentTime = this.viewer.clock.startTime - this.viewer.clock.multiplier;
                         resolve();
                     }, 3200)
                 })
@@ -80,8 +75,6 @@ export default class AnimationController {
 
     play() {
         return this.start().then(() => {
-            console.log("PLAY");
-            console.log(this.viewer.clock.clockRange);
             if(JulianDate.equals(this.viewer.clock.currentTime, this.viewer.clock.stopTime)) {
                 this.viewer.clock.currentTime = this.viewer.clock.startTime;
             }
@@ -102,8 +95,6 @@ export default class AnimationController {
         this.viewer.dataSources.get(0).show = true;
         this.viewer.trackedEntity = null;
         this.viewer.clock.currentTime = this.viewer.clock.startTime;
-        console.log(this.initialDestination);
-        console.log(this.initialOrientation);
         if(this.initialDestination && this.initialOrientation) {
             return this.viewer.camera.flyTo({
                 destination: this.initialDestination,
@@ -119,22 +110,22 @@ export default class AnimationController {
         this.viewer.clock.multiplier = value;
     }
 
-    setTimeFromTimeline(event) {
-        //const secondsSinceStart = this.animationProgress.getTimeFromAnimationProgress(event);
-        //this.viewer.clock.currentTime = JulianDate.addSeconds(this.viewer.clock.startTime, secondsSinceStart, new JulianDate());
+    setTimeFromTimeline() {
         this.start();
     }
 
 
 
     _tickListener() {
-        const track = this.viewer.dataSources.get(1);
-        this._headingRotation(track);
         if(this.animationInitialized && this.backward < 3000) {
+            this.viewer.clock.currentTime = this.viewer.clock.startTime - this.viewer.clock.multiplier;
             this.viewer.camera.moveBackward(50);
             this.backward += 50;
+        } else {
+            const track = this.viewer.dataSources.get(1);
+            this._headingRotation(track);
+            this.actions.updateAnimationProgress(JulianDate.secondsDifference(this.viewer.clock.currentTime, this.viewer.clock.startTime));        
         }
-        this.actions.updateAnimationProgress(JulianDate.secondsDifference(this.viewer.clock.currentTime, this.viewer.clock.startTime));        
     }
 
     _headingRotation(track) {

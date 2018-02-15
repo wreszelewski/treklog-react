@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import { Dimmer, Loader, Image, Segment } from 'semantic-ui-react'
+import { Dimmer, Loader } from 'semantic-ui-react'
 import './styles/TreklogLoader.css';
 
 export default class TreklogLoader extends Component {

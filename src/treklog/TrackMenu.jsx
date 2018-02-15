@@ -1,11 +1,6 @@
 import React, {Component} from "react";
-import firebase from "firebase";
-import config from "../config";
-import moment from "moment";
 import './styles/TrackMenu.css';
-import {Modal,Button} from 'semantic-ui-react';
-import Moment from 'react-moment';
-import 'moment/locale/pl';
+import {Modal} from 'semantic-ui-react';
 import TrackMenuItem from './TrackMenuItem';
 import { getTracks } from './helpers/trackLoader';
 
@@ -30,8 +25,8 @@ export default class TrackMenu extends Component {
     render() {
 
         return (
-            <Modal className="trackMenu" basic size="small" open={this.props.open} onClose={this.handleClose}>
-                <div className="content">
+            <Modal basic size="small" open={this.props.open} onClose={this.handleClose}>
+                <div className="trackMenu content">
                     <h1>Treklog</h1>
                     <div id="trackListContainer">
                         <div id="trackList" className="ui link divided items">

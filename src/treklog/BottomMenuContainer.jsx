@@ -1,4 +1,3 @@
-import React, {Component} from "react";
 import BottomMenu from './BottomMenu';
 import { connect } from 'react-redux';
 import {bindActionCreators} from 'redux';  

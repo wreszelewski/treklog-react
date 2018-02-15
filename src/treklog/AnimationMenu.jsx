@@ -6,7 +6,7 @@ import './styles/AnimationMenu.css';
 export default class AnimationMenu extends Component {
 
     state = {
-        speed: 300,
+        speed: 1000,
         showSettings: false
     }
 
@@ -16,7 +16,9 @@ export default class AnimationMenu extends Component {
         this.props.actions.animationSetSpeed(this.state.speed);
     }
 
-    
+    componentDidMount() {
+        this.props.actions.animationSetSpeed(this.state.speed);
+    }
 
     render() {
             return (    
@@ -55,4 +57,4 @@ export default class AnimationMenu extends Component {
             
             );
     }
-}500
+}

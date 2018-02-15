@@ -4,3 +4,16 @@
 .cesium-viewer-bottom {
     left: 0!important;
 }
+@media(max-width: 575px) {
+    .cesium-credit-lightbox-title {
+        padding-top: 60px;
+        padding-left: 40px;
+    }
+    .cesium-credit-lightbox-close {
+        top: 60px;
+        left: 13px
+    }
+    .cesium-credit-lightbox > ul {
+        padding: 12px 30px 12px 40px;
+    }
+}

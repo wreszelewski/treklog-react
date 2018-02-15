@@ -36,7 +36,6 @@ function fromGeoJson(geojson, altitude, multiplier = 300) {
             multiplier: multiplier
         }
     }
-    console.log("POINT1");
     czml.push(globalElement);
     const czmlPath = createCzmlPath(geojson, altitude);
        
@@ -45,7 +44,7 @@ function fromGeoJson(geojson, altitude, multiplier = 300) {
                 id: "path",
                 availability: globalAvailability,
                 billboard : {
-                    image : "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4QsOFx4xGjWutQAAAOdJREFUaN7tmcsSxSAIQ43T//9l7upuurFIEBxg207NMfHZMbq6ahdYH5IxRNkwUgBohbNBECmeAYFo8VYIZBBvgYCbeHm9BrhA4Ih4R4h5+zowo3NvbauOA7qpAdv519bjt0nBxQ5cH6EGKATgM4iNK3EcgMi350SQ54hwR5A6gxjE8zOzLU6E/lH4GiXiGOAfaFYQC/Fap/nTKJBzDGSteod6L4jdWa5mhNguWNaY2g4wXAi93LVCMLYnHaFdF9L84NiBYO5sZ4Dl1E6bmcUdj9AqSh6Abj32hohwhwJx8lq+q6ti/QC86zxQ2Gxr3gAAAABJRU5ErkJggg==",
+                    image : "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4gIOFSgat5UCMQAAAPpJREFUaN7tmcENwjAMResojAMr0NFhBRgHpHLiQFWUOv62A7ZvVav2v/g7cdJpysiIHYR60eNyXDjPH+Y7DQHAFY4GIU/xCAjyFi+FoBHESyBIS3w93z6un9eTCgRZiNeEKL++DhRv30u/FScDnNjy+l7/c6NqjYyW4LRQAiSAQRFLV2I3gG/C1/eRINVCuCZInCJG7WHR34JY6G2FvVZC1gB8Q9OCaInnZho+jVr1QH9TxPE29VoQvbNcTAuhsyBZY2JnAJEF18NdKQSiPUkL9WZhmB8cPRDIztbcQui2vIwsztxCLStpAKqN2BrCIzsQCMtj+YyMiPECGyx1CzIp1+MAAAAASUVORK5CYII=",
                     scale : 0.75,
                     verticalOrigin: "BOTTOM",
                     eyeOffset: {
@@ -60,10 +59,10 @@ function fromGeoJson(geojson, altitude, multiplier = 300) {
                     material: {
                         polylineOutline: {
                             color: {
-                                rgba: [255,0,0, 400]
+                                rgba: [251,192,45, 400]
                             },
                             outlineColor: {
-                                rgba: [255,0,0, 400]
+                                rgba: [251,192,45, 400]
                             },
                             outlineWidth: 5
                         }

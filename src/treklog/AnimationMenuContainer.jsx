@@ -1,4 +1,3 @@
-import React, {Component} from "react";
 import AnimationMenu from './AnimationMenu';
 import { connect } from 'react-redux';
 import {bindActionCreators} from 'redux';  

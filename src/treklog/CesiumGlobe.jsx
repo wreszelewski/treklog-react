@@ -6,6 +6,7 @@ import ArcGisMapServerImageryProvider from "cesium/Source/Scene/ArcGisMapServerI
 import MapboxImageryProvider from "cesium/Source/Scene/MapboxImageryProvider";
 import CesiumTerrainProvider from "cesium/Source/Core/CesiumTerrainProvider";
 import Cartographic from "cesium/Source/Core/Cartographic";
+import Color from "cesium/Source/Core/Color";
 import sampleTerrainMostDetailed from "cesium/Source/Core/sampleTerrainMostDetailed";
 import GeoJsonDataSource from "cesium/Source/DataSources/GeoJsonDataSource"
 import CzmlDataSource from "cesium/Source/DataSources/CzmlDataSource"
@@ -17,7 +18,7 @@ import AnimationController from './helpers/AnimationController'
 import {bindActionCreators} from 'redux';  
 import * as treklogActions from "./state/actions";
 import JulianDate from "cesium/Source/Core/JulianDate"
-
+import config from "../config";
 
 class CesiumGlobe extends Component {
     state = {
@@ -44,13 +45,14 @@ class CesiumGlobe extends Component {
                 navigationHelpButton: false,
                 navigationInstructionsInitiallyVisible: false,
                 clockViewModel: null,
-                imageryProviderViewModels: this.getImageryProviders(),
+                imageryProviderViewModels: this.getImageryProviders(config),
                 terrainProviderViewModels: [],
                 terrainExaggeration: 2.0,
                 fullscreenButton: false,
-                creditContainer: 'cesiumAttribution'
+                creditContainer: 'cesiumAttribution',
+                creditViewport: 'cesiumAttributionOverlay'
             });
-            this.state.animation = new AnimationController(this.viewer, this.props.actions);
+            this.setState({animation: new AnimationController(this.viewer, this.props.actions)});
     
             this.viewer.terrainProvider = new CesiumTerrainProvider({
                 url: 'https://assets.agi.com/stk-terrain/world',
@@ -61,35 +63,28 @@ class CesiumGlobe extends Component {
             this.viewer.scene.globe.depthTestAgainstTerrain = true;
         }
 
-        console.log(this.props.track);
-
-        this.state.viewerLoaded = true;
+        this.setState({viewerLoaded: true});
     }
 
     loadTrack(track) {
-        console.log("LOAD TRACK");
         this.viewer.dataSources.removeAll();
         return this.getCesiumTerrainForGeoJson(track.geoJsonPoints).then((altitudeData) => {
-            console.log("ALTITUDE");
             track.czmlAltitude = altitudeData;
             const geoJsonDs = GeoJsonDataSource.load(track.geoJsonPoints, {
-                stroke: 'red',
-                fill: 'red',
-                strokeWidth: 40,
+                stroke: new Color(0.98, 0.75, 0.18),
+                fill: new Color(0.98, 0.75, 0.18),
+                strokeWidth: 20,
                 clampToGround: true
             });
-            console.log("TU");
             const czmlDoc = czml.fromGeoJson(track.geoJsonPoints, track.czmlAltitude)
             const czmlDs = CzmlDataSource.load(czmlDoc);
             return Promise.all([geoJsonDs, czmlDs]);
         }).then(([geoJsonDs, czmlDs]) => {
-            console.log("HERE1");
             const addGeoJson = this.viewer.dataSources.add(geoJsonDs);
             const addCzml = this.viewer.dataSources.add(czmlDs);
             return Promise.all([addGeoJson, addCzml]);
         }).then(([addGeoJson, addCzml]) => {
             addCzml.show = false;
-            console.log("HERE2");
             this.state.animation.initialize(track);
             if(track.initialPosition.position) {
                  const destination = cameraPosition.getDestination(track);
@@ -118,7 +113,6 @@ class CesiumGlobe extends Component {
         }
         if(this.state.animation) {
             if(this.state.animation.animationInitialized && nextProps.animation.reset) {
-                console.log("RESET");
                 this.state.animation.reset();
             }
             if(this.state.animation.animationInitialized && !nextProps.animation.shouldBeInitialized) {
@@ -128,20 +122,15 @@ class CesiumGlobe extends Component {
                 this.state.animation.play();
             }
             if(this.viewer.clock.shouldAnimate && !nextProps.animation.shouldPlay) {
-                console.log("PAUSE");
                 this.state.animation.pause();
             }
             if(this.viewer.clock.multiplier !== nextProps.animation.speed) {
                 this.state.animation.setSpeed(nextProps.animation.speed);
-                console.log(this.viewer.clock.multiplier);
 
             }
 
             if(nextProps.animation.newTime) {
-                console.log("TEST SET TIME");
-                console.log(this.viewer.clock.currentTime);
                 this.viewer.clock.currentTime = JulianDate.addSeconds(this.viewer.clock.startTime, nextProps.animation.newTime, new JulianDate());
-                console.log(this.viewer.clock.currentTime);
             }
             
 

@@ -6,7 +6,6 @@ export function getTrackLoader(url, tracks, actions) {
 }
 
 export function loadTrack(url, tracks, actions) {
-    console.log(tracks);
     if(Object.keys(tracks).length === 0) {
         return null;
     }
@@ -14,8 +13,6 @@ export function loadTrack(url, tracks, actions) {
     actions.showTreklogLoader();
     actions.fetchTrackStarted();
     actions.hideTrackMenu();
-    console.log(url);
-    console.log(tracks);
     let track = tracks[url];
     return getPoints(track.geoJsonPath)
         .then((geoJsonPoints) => {

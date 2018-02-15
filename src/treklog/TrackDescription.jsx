@@ -6,6 +6,8 @@ import { formatSeconds } from './helpers/time'
 export default class TrackDescription extends Component {
 
   render() {
+      if(this.props.track.ascent) {
+
         return (    
         
         <div id="trackDescription" className="trackDescription">
@@ -67,7 +69,31 @@ export default class TrackDescription extends Component {
                 />
             </div>
         </div>
-    
-    );
+        )} else {
+            return(
+        <div id="trackDescription" className="trackDescription">
+            <h1 id="trackName">{this.props.track.name}</h1><h2 id="trackDesc">{this.props.track.description}</h2>
+            <div className="trackStats">
+                <Popup
+                    trigger={
+                        <Label className="singleStat">
+                            <Icon name="wait" /><span>{formatSeconds(this.props.track.duration / 1000)}</span>
+                        </Label>
+                    }
+                    content="Czas trwania"
+                    position="top center"
+                />
+                <Popup
+                    trigger={
+                        <Label className="singleStat">
+                            <Icon name="resize horizontal" /><span>{this.props.track.distance / 1000}km</span>
+                        </Label>
+                    }
+                    content="Dystans"
+                    position="top center"
+                />
+            </div>
+        </div>);
+      }
   }
 }
