@@ -1,0 +1,30 @@
+{
+  "hosting": {
+    "public": "build",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "src/**",
+      "scripts/**",
+      "distdll/**",
+      "config/**",
+      "coverage/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "function": "indexPage"
+      }
+    ],
+    "headers": [
+      {
+        "source" : "**/*.@(jpg|jpeg|gif|png|css|js)",
+        "headers" : [ {
+          "key" : "Cache-Control",
+          "value" : "max-age=86400"
+        } ]
+      }
+    ]
+  }
+}

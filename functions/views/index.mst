@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Use correct character set. -->
+    <meta charset="utf-8">
+    <!-- Tell IE to use the latest, best version. -->
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+        <meta property="fb:app_id" content="314100332403362" />
+        <meta property="og:type"   content="fitness.course" /> 
+        <meta property="og:url"    content="https://treklog.reszelewski.pl{{{url}}}" /> 
+        <meta property="og:title"  content="{{name}}" /> 
+        <meta property="og:image"  content="{{{socialImage}}}" />
+        <meta property="og:description"  content="{{{description}}}" />
+        <meta property="fitness:distance:value"  content="{{{distance}}}" />
+        <meta property="fitness:distance:units"  content="km" />
+        <meta property="fitness:duration:value"  content="{{{duration}}}" />
+        <meta property="fitness:duration:units"  content="ms" />
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.12/semantic.min.css"></link>
+
+    <title>Treklog</title>
+
+</head>
+
+<body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+    <script src="cesium/cesiumDll.js">
+    </script>
+    <script type="text/javascript" src="/static/js/main.b274b00f.js">
+    </script>
+    </body>
+
+</html>
