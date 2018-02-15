@@ -19,7 +19,6 @@
         <meta property="fitness:duration:value"  content="{{{duration}}}" />
         <meta property="fitness:duration:units"  content="ms" />
         <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.12/semantic.min.css"></link>
-
     <title>Treklog</title>
 
 </head>
@@ -27,10 +26,10 @@
 <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
-    <script src="cesium/cesiumDll.js">
-    </script>
-    <script type="text/javascript" src="/static/js/main.b274b00f.js">
-    </script>
+    <% if(htmlWebpackPlugin.options.production) { %>
+        <script src="/cesium/cesiumDll.js"></script>
+    <% } %>
+
     </body>
 
 </html>
