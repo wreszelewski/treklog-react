@@ -21,3 +21,6 @@ distdll/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+functions/package-lock.json
+.vscode/settings.json
+.firebaserc
