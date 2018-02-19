@@ -6,6 +6,7 @@ import ArcGisMapServerImageryProvider from "cesium/Source/Scene/ArcGisMapServerI
 import MapboxImageryProvider from "cesium/Source/Scene/MapboxImageryProvider";
 import CesiumTerrainProvider from "cesium/Source/Core/CesiumTerrainProvider";
 import Cartographic from "cesium/Source/Core/Cartographic";
+import Cartesian3 from "cesium/Source/Core/Cartesian3";
 import HeadingPitchRange from "cesium/Source/Core/HeadingPitchRange";
 import Color from "cesium/Source/Core/Color";
 import sampleTerrainMostDetailed from "cesium/Source/Core/sampleTerrainMostDetailed";
@@ -20,6 +21,8 @@ import {bindActionCreators} from 'redux';
 import * as treklogActions from "./state/actions";
 import JulianDate from "cesium/Source/Core/JulianDate"
 import config from "../config";
+import firebase from "firebase";
+import moment from "moment";
 
 class CesiumGlobe extends Component {
     state = {
@@ -66,9 +69,31 @@ class CesiumGlobe extends Component {
         this.setState({viewerLoaded: true});
     }
 
+
     loadTrack(track) {
         console.log(track);
-        this.viewer.dataSources.removeAll();
+        firebase.database().ref('/currentLive').on('value', (snapshot) => {
+            const currentLiveData = snapshot.val();
+            console.log(currentLiveData);
+            if(this.viewer.dataSources.get(1)) {
+                const time = new JulianDate.fromIso8601(currentLiveData.lastUpdate);
+                const position = Cartesian3.fromDegrees(currentLiveData.point.longitude, currentLiveData.point.latitude, currentLiveData.point.elevation);
+                console.log(this.viewer.clock.startTime);
+                const availability = JulianDate.toIso8601(this.viewer.clock.startTime) + '/' + moment(currentLiveData.lastUpdate).toISOString();
+                console.log(availability);
+                this.viewer.dataSources.get(1).process({
+                    id: 'path',
+                    position: {
+                        availability: availability,
+                        cartographicDegrees: [currentLiveData.lastUpdate, currentLiveData.point.latitude, currentLiveData.point.longitude, currentLiveData.point.elevation]
+                    }
+                }).then(data => {
+                    console.log(data);
+                    this.viewer.clock.stopTime = JulianDate.fromIso8601(moment(currentLiveData.lastUpdate).subtract(60, 'seconds').toISOString());
+                    this.viewer.clock.shouldAnimate = true;
+                });
+            }
+        });
         return this.getCesiumTerrainForGeoJson(track.geoJsonPoints).then((altitudeData) => {
             console.log("LOAD DS")
             track.czmlAltitude = altitudeData;
@@ -83,6 +108,7 @@ class CesiumGlobe extends Component {
             return Promise.all([geoJsonDs, czmlDs]);
         }).then(([geoJsonDs, czmlDs]) => {
             console.log("DS LOADED");
+            this.viewer.dataSources.removeAll();
             const addGeoJson = this.viewer.dataSources.add(geoJsonDs);
             const addCzml = this.viewer.dataSources.add(czmlDs);
             return Promise.all([addGeoJson, addCzml]);
@@ -108,6 +134,10 @@ class CesiumGlobe extends Component {
             }
         }); 
 
+    }
+
+    flyToTrack(track) {
+        
     }
 
     getCesiumTerrainForGeoJson(geojson) {

@@ -74,7 +74,12 @@ function createLiveTrack(point) {
     const uploadLiveConfig = admin.database().ref('currentLive').set({
         trackUrl: '/' + year + '/live-' + timestampSuffix,
         geoJsonPath: 'gpsTracks/live-' + timestampSuffix,
-        lastUpdate: moment().toISOString()
+        lastUpdate: point.timestamp,
+        point: {
+            longitude: parseFloat(point.longitude),
+            latitude: parseFloat(point.latitude),
+            elevation: parseFloat(point.elevation)
+        }
     });
     return Promise.all([fileUpload, dbUpload, uploadLiveConfig]);
 
@@ -99,11 +104,16 @@ function updateLiveTrack(point, currentLive) {
                     contentType: 'application/json'
                 }
             }).then(() => fs.unlinkSync(tempFilePath));
-            const updateCurrentLive = admin.database().ref('currentLive').child('lastUpdate').set(moment().toISOString());
+            const updateCurrentLive = admin.database().ref('currentLive').child('lastUpdate').set(point.timestamp);
+            const updateCurrentLivePoint = admin.database().ref('currentLive').child('point').set({
+                longitude: parseFloat(point.longitude),
+                latitude: parseFloat(point.latitude),
+                elevation: parseFloat(point.elevation)
+            });
             const trackDetailsRef = admin.database().ref('tracks' + currentLive.trackUrl);
             const updateTrackDetails = Promise.all([
                 trackDetailsRef.child('duration').set(1000)
             ]);
-            return Promise.all([updateFile, updateCurrentLive, updateTrackDetails]);
+            return Promise.all([updateFile, updateCurrentLive, updateCurrentLivePoint, updateTrackDetails]);
         });
 }

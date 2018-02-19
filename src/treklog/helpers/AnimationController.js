@@ -52,7 +52,7 @@ export default class AnimationController {
                 this.viewer.dataSources.get(0).show = false;
                 this.viewer.dataSources.get(1).show = true;
                 const track = this.viewer.dataSources.get(1);
-                this.lastHeading = calculateMovementHeading(track, this.viewer);            
+                //this.lastHeading = calculateMovementHeading(track, this.viewer);            
                 
                 if(fly) {
                     this.viewer.flyTo(track.entities.getById('path'));
@@ -122,8 +122,8 @@ export default class AnimationController {
             this.viewer.camera.moveBackward(50);
             this.backward += 50;
         } else {
-            const track = this.viewer.dataSources.get(1);
-            this._headingRotation(track);
+            //const track = this.viewer.dataSources.get(1);
+            //this._headingRotation(track);
             this.actions.updateAnimationProgress(JulianDate.secondsDifference(this.viewer.clock.currentTime, this.viewer.clock.startTime));        
         }
     }
