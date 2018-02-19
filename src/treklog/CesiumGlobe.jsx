@@ -83,13 +83,21 @@ class CesiumGlobe extends Component {
                 console.log(availability);
                 this.viewer.dataSources.get(1).process({
                     id: 'path',
+                    availability: availability,
                     position: {
-                        availability: availability,
                         cartographicDegrees: [currentLiveData.lastUpdate, currentLiveData.point.latitude, currentLiveData.point.longitude, currentLiveData.point.elevation]
                     }
                 }).then(data => {
-                    console.log(data);
-                    this.viewer.clock.stopTime = JulianDate.fromIso8601(moment(currentLiveData.lastUpdate).subtract(60, 'seconds').toISOString());
+                    this.viewer.dataSources.get(1).process({
+                     id: 'document',
+                     clock: {
+                        interval: availability,
+                        currentTime: JulianDate.toIso8601(this.viewer.clock.currentTime),
+                        multiplier: this.viewer.clock.multiplier
+
+                     }
+                })}).then(() => {
+                    this.viewer.clock.stopTime = JulianDate.fromIso8601(currentLiveData.lastUpdate);
                     this.viewer.clock.shouldAnimate = true;
                 });
             }

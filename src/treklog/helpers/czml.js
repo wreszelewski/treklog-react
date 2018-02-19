@@ -29,6 +29,7 @@ function fromGeoJson(geojson, altitude, multiplier = 300) {
         clock: {
             interval: globalAvailability,
             currentTime: globalStartTime,
+            range: 'CLAMPED',
             multiplier: multiplier
         }
     }
