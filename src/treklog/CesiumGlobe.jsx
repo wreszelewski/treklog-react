@@ -6,6 +6,7 @@ import ArcGisMapServerImageryProvider from "cesium/Source/Scene/ArcGisMapServerI
 import MapboxImageryProvider from "cesium/Source/Scene/MapboxImageryProvider";
 import CesiumTerrainProvider from "cesium/Source/Core/CesiumTerrainProvider";
 import Cartographic from "cesium/Source/Core/Cartographic";
+import HeadingPitchRange from "cesium/Source/Core/HeadingPitchRange";
 import Color from "cesium/Source/Core/Color";
 import sampleTerrainMostDetailed from "cesium/Source/Core/sampleTerrainMostDetailed";
 import GeoJsonDataSource from "cesium/Source/DataSources/GeoJsonDataSource"
@@ -49,8 +50,7 @@ class CesiumGlobe extends Component {
                 terrainProviderViewModels: [],
                 terrainExaggeration: 2.0,
                 fullscreenButton: false,
-                creditContainer: 'cesiumAttribution',
-                creditViewport: 'cesiumAttributionOverlay'
+                creditContainer: 'cesiumAttribution'
             });
             this.setState({animation: new AnimationController(this.viewer, this.props.actions)});
     
@@ -67,8 +67,10 @@ class CesiumGlobe extends Component {
     }
 
     loadTrack(track) {
+        console.log(track);
         this.viewer.dataSources.removeAll();
         return this.getCesiumTerrainForGeoJson(track.geoJsonPoints).then((altitudeData) => {
+            console.log("LOAD DS")
             track.czmlAltitude = altitudeData;
             const geoJsonDs = GeoJsonDataSource.load(track.geoJsonPoints, {
                 stroke: new Color(0.98, 0.75, 0.18),
@@ -80,13 +82,18 @@ class CesiumGlobe extends Component {
             const czmlDs = CzmlDataSource.load(czmlDoc);
             return Promise.all([geoJsonDs, czmlDs]);
         }).then(([geoJsonDs, czmlDs]) => {
+            console.log("DS LOADED");
             const addGeoJson = this.viewer.dataSources.add(geoJsonDs);
             const addCzml = this.viewer.dataSources.add(czmlDs);
             return Promise.all([addGeoJson, addCzml]);
         }).then(([addGeoJson, addCzml]) => {
+            console.log("DSES ADDED");
             addCzml.show = false;
+            console.log("CZML HIDDEN");
             this.state.animation.initialize(track);
+            console.log("ANIMATION INITED");
             if(track.initialPosition.position) {
+                console.log("FLAJJ ajaj");                
                  const destination = cameraPosition.getDestination(track);
                  const orientation = cameraPosition.getOrientation(track);
                 
@@ -96,7 +103,8 @@ class CesiumGlobe extends Component {
                     maxiumumHeight: 10000
                 });
             } else {
-                return this.viewer.flyTo(addGeoJson);
+                console.log("FLAJJ");
+                return this.viewer.flyTo(addGeoJson, {offset: new HeadingPitchRange(0, -1.57, 4000)});
             }
         }); 
 

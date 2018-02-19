@@ -20,15 +20,15 @@
         <meta property="fitness:duration:units"  content="ms" />
         <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.12/semantic.min.css"></link>
     <title>Treklog</title>
+    <link href="/static/css/main.29703fc4.css" rel="stylesheet">
 
 </head>
 
 <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
-    <% if(htmlWebpackPlugin.options.production) { %>
-        <script src="/cesium/cesiumDll.js"></script>
-    <% } %>
+    <script src="/cesium/cesiumDll.js"></script>
+    <script type="text/javascript" src="/static/js/main.65377b0c.js"></script>
 
     </body>
 
