@@ -69,47 +69,52 @@ class CesiumGlobe extends Component {
         this.setState({viewerLoaded: true});
     }
 
+    registerLiveTrackListener(track) {
+        firebase.database().ref('/currentLive').on('value', (snapshot) => {
+            if(currentLive.trackUrl === track.url) {
+                const currentLiveData = snapshot.val();
+                if(this.viewer.dataSources.get(1)) {
+                    const time = new JulianDate.fromIso8601(currentLiveData.lastUpdate);
+                    const position = Cartesian3.fromDegrees(currentLiveData.point.longitude, currentLiveData.point.latitude, currentLiveData.point.elevation);
+                    const availability = JulianDate.toIso8601(this.viewer.clock.startTime) + '/' + moment(currentLiveData.lastUpdate).toISOString();
+                    const pathCarto = [new Cartographic.fromDegrees(currentLiveData.point.latitude, currentLiveData.point.longitude)];
+                    sampleTerrainMostDetailed(this.viewer.terrainProvider, pathCarto)
+                        .then(altitude => {
+                            return this.viewer.dataSources.get(1).process({
+                                id: 'path',
+                                availability: availability,
+                                position: {
+                                    cartographicDegrees: [currentLiveData.lastUpdate, currentLiveData.point.latitude, currentLiveData.point.longitude, (altitude[0].height*2)+4]
+                                }
+                            })
+                        })
+                        .then(data => {
+                            this.viewer.dataSources.get(1).process({
+                                id: 'document',
+                                clock: {
+                                    interval: availability,
+                                    currentTime: JulianDate.toIso8601(this.viewer.clock.currentTime),
+                                    multiplier: this.viewer.clock.multiplier
+        
+                                }
+                            })
+                        }).then(() => {
+                            this.viewer.clock.stopTime = JulianDate.fromIso8601(currentLiveData.lastUpdate);
+                            this.viewer.clock.shouldAnimate = true;
+                        });
+                }
+            } else {
+                firebase.database().ref('/currentLive').off();
+            }
+        });
+    }
 
     loadTrack(track) {
         console.log(track);
-        firebase.database().ref('/currentLive').on('value', (snapshot) => {
-            const currentLiveData = snapshot.val();
-            console.log(currentLiveData);
-            if(this.viewer.dataSources.get(1)) {
-                const time = new JulianDate.fromIso8601(currentLiveData.lastUpdate);
-                const position = Cartesian3.fromDegrees(currentLiveData.point.longitude, currentLiveData.point.latitude, currentLiveData.point.elevation);
-                console.log(this.viewer.clock.startTime);
-                const availability = JulianDate.toIso8601(this.viewer.clock.startTime) + '/' + moment(currentLiveData.lastUpdate).toISOString();
-                console.log(availability);
-                const pathCarto = [new Cartographic.fromDegrees(currentLiveData.point.latitude, currentLiveData.point.longitude)];
-                sampleTerrainMostDetailed(this.viewer.terrainProvider, pathCarto)
-                    .then(altitude => {
-                        console.log(altitude);
-                       return this.viewer.dataSources.get(1).process({
-                            id: 'path',
-                            availability: availability,
-                            position: {
-                                cartographicDegrees: [currentLiveData.lastUpdate, currentLiveData.point.latitude, currentLiveData.point.longitude, (altitude[0].height*2)+4]
-                            }
-                        })
-                    })
-                            .then(data => {
-                    this.viewer.dataSources.get(1).process({
-                     id: 'document',
-                     clock: {
-                        interval: availability,
-                        currentTime: JulianDate.toIso8601(this.viewer.clock.currentTime),
-                        multiplier: this.viewer.clock.multiplier
-
-                     }
-                })}).then(() => {
-                    this.viewer.clock.stopTime = JulianDate.fromIso8601(currentLiveData.lastUpdate);
-                    this.viewer.clock.shouldAnimate = true;
-                });
-            }
-        });
+        if(track.isLife) {
+            this.registerLiveTrackListener();
+        }
         return this.getCesiumTerrainForGeoJson(track.geoJsonPoints).then((altitudeData) => {
-            console.log("LOAD DS")
             track.czmlAltitude = altitudeData;
             const geoJsonDs = GeoJsonDataSource.load(track.geoJsonPoints, {
                 stroke: new Color(0.98, 0.75, 0.18),
@@ -121,19 +126,14 @@ class CesiumGlobe extends Component {
             const czmlDs = CzmlDataSource.load(czmlDoc);
             return Promise.all([geoJsonDs, czmlDs]);
         }).then(([geoJsonDs, czmlDs]) => {
-            console.log("DS LOADED");
             this.viewer.dataSources.removeAll();
             const addGeoJson = this.viewer.dataSources.add(geoJsonDs);
             const addCzml = this.viewer.dataSources.add(czmlDs);
             return Promise.all([addGeoJson, addCzml]);
         }).then(([addGeoJson, addCzml]) => {
-            console.log("DSES ADDED");
             addCzml.show = false;
-            console.log("CZML HIDDEN");
             this.state.animation.initialize(track);
-            console.log("ANIMATION INITED");
             if(track.initialPosition.position) {
-                console.log("FLAJJ ajaj");                
                  const destination = cameraPosition.getDestination(track);
                  const orientation = cameraPosition.getOrientation(track);
                 
@@ -143,7 +143,6 @@ class CesiumGlobe extends Component {
                     maxiumumHeight: 10000
                 });
             } else {
-                console.log("FLAJJ");
                 return this.viewer.flyTo(addGeoJson, {offset: new HeadingPitchRange(0, -1.57, 4000)});
             }
         }); 

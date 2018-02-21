@@ -33,6 +33,9 @@ exports.addLiveTrackPoint = functions.https.onRequest((req, res) => {
             if(currentLive && moment(currentLive.lastUpdate).add(6, 'hours').isAfter(moment())) {
                 return updateLiveTrack(req.body, currentLive);
             } else {
+                if(currentLive) {
+                    admin.database().ref(currentLive.trackUrl).child('isLife').set(false);
+                }
                 return createLiveTrack(req.body);
             }
         })
@@ -67,8 +70,7 @@ function createLiveTrack(point) {
             pitch: -0.6981317007977318,
             height: 14000
         },
-        duration: 1000,
-        distance: 0,
+        isLife: true,
         hide: true
     });
     const uploadLiveConfig = admin.database().ref('currentLive').set({
@@ -110,10 +112,6 @@ function updateLiveTrack(point, currentLive) {
                 latitude: parseFloat(point.latitude),
                 elevation: parseFloat(point.elevation)
             });
-            const trackDetailsRef = admin.database().ref('tracks' + currentLive.trackUrl);
-            const updateTrackDetails = Promise.all([
-                trackDetailsRef.child('duration').set(1000)
-            ]);
-            return Promise.all([updateFile, updateCurrentLive, updateCurrentLivePoint, updateTrackDetails]);
+            return Promise.all([updateFile, updateCurrentLive, updateCurrentLivePoint]);
         });
 }
