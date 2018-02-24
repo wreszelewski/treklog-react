@@ -71,8 +71,8 @@ class CesiumGlobe extends Component {
 
     registerLiveTrackListener(track) {
         firebase.database().ref('/currentLive').on('value', (snapshot) => {
-            if(currentLive.trackUrl === track.url) {
-                const currentLiveData = snapshot.val();
+            const currentLiveData = snapshot.val();
+            if(currentLiveData.trackUrl === track.url) {
                 if(this.viewer.dataSources.get(1)) {
                     const time = new JulianDate.fromIso8601(currentLiveData.lastUpdate);
                     const position = Cartesian3.fromDegrees(currentLiveData.point.longitude, currentLiveData.point.latitude, currentLiveData.point.elevation);
