@@ -37,23 +37,29 @@ export default class AnimationProgress extends Component {
     }
 
     componentDidMount() {
-        ReactDOM.findDOMNode(this.refs['animationProgress']).children[0].children[0].innerHTML = formatSeconds(this.props.animation.currentTime);
+        ReactDOM.findDOMNode(this.refs['animationProgress']).children[0].children[0].innerHTML = formatSeconds(this.props.animation.currentTime) || '';
     }
 
     componentDidUpdate() {
-        ReactDOM.findDOMNode(this.refs['animationProgress']).children[0].children[0].innerHTML = formatSeconds(this.props.animation.currentTime);
+        ReactDOM.findDOMNode(this.refs['animationProgress']).children[0].children[0].innerHTML = formatSeconds(this.props.animation.currentTime) || '';
     }
 
     render() {
-        if(this.state.showMouseLabel) {
-            return (    
-                <Progress ref="animationProgress" total={this.props.track.duration / 1000} value={this.props.animation.currentTime} active={false} precision={10} autoSuccess={false} className="white" onClick={e => this.setTimeFromAnimationProgress(e)} onMouseMove={e => this.showMouseLabel(e)} onMouseLeave={e => this.hideMouseLabel(e)} progress>
-                        <div id="mouseLabel" style={{left: this.state.leftPosition}}>{this.state.labelText}</div>
-                </Progress>
-            );
+        if(this.props.track.duration) {
+            if(this.state.showMouseLabel) {
+                return (    
+                    <Progress ref="animationProgress" total={this.props.track.duration / 1000} value={this.props.animation.currentTime} active={false} precision={10} autoSuccess={false} className="white" onClick={e => this.setTimeFromAnimationProgress(e)} onMouseMove={e => this.showMouseLabel(e)} onMouseLeave={e => this.hideMouseLabel(e)} progress>
+                            <div id="mouseLabel" style={{left: this.state.leftPosition}}>{this.state.labelText}</div>
+                    </Progress>
+                );
+            } else {
+                return (    
+                    <Progress ref="animationProgress" total={this.props.track.duration / 1000} value={this.props.animation.currentTime} active={false} precision={10} autoSuccess={false} className="white" onClick={e => this.setTimeFromAnimationProgress(e)} onMouseMove={e => this.showMouseLabel(e)} onMouseLeave={e => this.hideMouseLabel(e)} progress />
+                );
+            }
         } else {
-            return (    
-                <Progress ref="animationProgress" total={this.props.track.duration / 1000} value={this.props.animation.currentTime} active={false} precision={10} autoSuccess={false} className="white" onClick={e => this.setTimeFromAnimationProgress(e)} onMouseMove={e => this.showMouseLabel(e)} onMouseLeave={e => this.hideMouseLabel(e)} progress />
+            return (
+                <Progress ref="animationProgress" total={100} value={100} active={false} precision={10} autoSuccess={false} className="white" progress />
             );
         }
     }

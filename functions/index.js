@@ -29,12 +29,11 @@ exports.addLiveTrackPoint = functions.https.onRequest((req, res) => {
     return admin.database().ref('currentLive').once("value")
         .then(currentLive => currentLive.val())
         .then((currentLive) => {
-            console.log(currentLive);
-            if(currentLive && moment(currentLive.lastUpdate).add(6, 'hours').isAfter(moment())) {
+            if(currentLive && moment(currentLive.lastUpdate).add(6, 'hours').isAfter(moment(req.body.timestamp))) {
                 return updateLiveTrack(req.body, currentLive);
             } else {
                 if(currentLive) {
-                    admin.database().ref(currentLive.trackUrl).child('isLife').set(false);
+                    admin.database().ref(currentLive.trackUrl).child('isLive').set(false);
                 }
                 return createLiveTrack(req.body);
             }
@@ -50,7 +49,6 @@ function createLiveTrack(point) {
     const tempFilePath = path.join(os.tmpdir(), 'tmpTrack.geojson');
     fs.writeFileSync(tempFilePath, geoJson);
     const bucket = gcs.bucket(bucketName);
-    console.log("CREATE1");
     const fileUpload = bucket.upload(tempFilePath, {
         destination: 'gpsTracks/live-' + timestampSuffix,
         metadata: {
@@ -70,7 +68,7 @@ function createLiveTrack(point) {
             pitch: -0.6981317007977318,
             height: 14000
         },
-        isLife: true,
+        isLive: true,
         hide: true
     });
     const uploadLiveConfig = admin.database().ref('currentLive').set({

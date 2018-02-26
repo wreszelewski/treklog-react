@@ -111,8 +111,8 @@ class CesiumGlobe extends Component {
 
     loadTrack(track) {
         console.log(track);
-        if(track.isLife) {
-            this.registerLiveTrackListener();
+        if(track.isLive) {
+            this.registerLiveTrackListener(track);
         }
         return this.getCesiumTerrainForGeoJson(track.geoJsonPoints).then((altitudeData) => {
             track.czmlAltitude = altitudeData;

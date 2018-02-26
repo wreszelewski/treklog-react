@@ -9,7 +9,7 @@ export default class TrackDescriptionLabel extends Component {
                 <Popup
                     trigger={
                         <Label className="singleStat">
-                            <Icon name={this.props.icon} /><span>{this.props.value}</span>
+                            <Icon name={this.props.icon} /><span>{this.props.value + this.props.unit}</span>
                         </Label>
                     }
                     content={this.props.description}
