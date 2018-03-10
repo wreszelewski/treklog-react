@@ -66,8 +66,8 @@ export function animationSetSpeed(speed) {
   return { type: ANIMATION_SET_SPEED, speed };
 }
 
-export function updateAnimationProgress(currentTime) {
-  return { type: UPDATE_ANIMATION_PROGRESS, currentTime};
+export function updateAnimationProgress(currentRelativeTime, currentTime) {
+  return { type: UPDATE_ANIMATION_PROGRESS, currentRelativeTime, currentTime};
 }
 
 export function animationProgressSetTime(newTime) {

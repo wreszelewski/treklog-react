@@ -61,7 +61,7 @@ function reducer(state = initialState, action) {
     case ANIMATION_SET_SPEED:
         return Object.assign({}, state, {animation: {shouldPlay: state.animation.shouldPlay, shouldBeInitialized: state.animation.shouldBeInitialized, speed: parseInt(action.speed), currentTime: 0}})
     case UPDATE_ANIMATION_PROGRESS:
-        return Object.assign({}, state, {animation: Object.assign({}, state.animation, {currentTime: action.currentTime,  newTime: null, shouldReplay: false})});
+        return Object.assign({}, state, {animation: Object.assign({}, state.animation, {currentTime: action.currentRelativeTime, time: action.currentTime,  newTime: null, shouldReplay: false})});
     case ANIMATION_PROGRESS_SET_TIME:
         if(Math.abs(state.animation.currentTime - action.newTime) > 2) {
             return Object.assign({}, state, {animation: Object.assign({}, state.animation, {newTime: action.newTime})});

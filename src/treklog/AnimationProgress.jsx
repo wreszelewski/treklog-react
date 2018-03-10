@@ -2,6 +2,9 @@ import React, {Component} from 'react'
 import { Progress } from 'semantic-ui-react'
 import {formatSeconds} from './helpers/time';
 import ReactDOM from 'react-dom';
+import moment from 'moment';
+import JulianDate from "cesium/Source/Core/JulianDate"
+
 
 
 export default class AnimationProgress extends Component {
@@ -40,8 +43,16 @@ export default class AnimationProgress extends Component {
         ReactDOM.findDOMNode(this.refs['animationProgress']).children[0].children[0].innerHTML = formatSeconds(this.props.animation.currentTime) || '';
     }
 
+    formatTime(time) {
+        if(time) {
+            console.log()
+            return "Ostatnia aktualizacja: " + moment(JulianDate.toIso8601(time)).calendar();
+        }
+    }
+
     componentDidUpdate() {
-        ReactDOM.findDOMNode(this.refs['animationProgress']).children[0].children[0].innerHTML = formatSeconds(this.props.animation.currentTime) || '';
+        console.log(this.props.animation);
+        ReactDOM.findDOMNode(this.refs['animationProgress']).children[0].children[0].innerHTML = this.formatTime(this.props.animation.time) || formatSeconds(this.props.animation.currentTime) || '';
     }
 
     render() {

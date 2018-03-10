@@ -29,7 +29,7 @@ exports.addLiveTrackPoint = functions.https.onRequest((req, res) => {
     return admin.database().ref('currentLive').once("value")
         .then(currentLive => currentLive.val())
         .then((currentLive) => {
-            if(currentLive && moment(currentLive.lastUpdate).add(6, 'hours').isAfter(moment(req.body.timestamp))) {
+            if(currentLive && moment(currentLive.lastUpdate).add(6, 'hours').isAfter(moment.utc(req.body.timestamp).toISOString())) {
                 return updateLiveTrack(req.body, currentLive);
             } else {
                 if(currentLive) {
@@ -44,7 +44,7 @@ exports.addLiveTrackPoint = functions.https.onRequest((req, res) => {
 });
 
 function createLiveTrack(point) {
-    const timestampSuffix = moment().toISOString().replace('.', '-');
+    const timestampSuffix = moment.utc(point.timestamp).toISOString().replace('.', '-');
     const geoJson = Mustache.render(geoJsonTemplate, { point });
     const tempFilePath = path.join(os.tmpdir(), 'tmpTrack.geojson');
     fs.writeFileSync(tempFilePath, geoJson);
@@ -74,7 +74,7 @@ function createLiveTrack(point) {
     const uploadLiveConfig = admin.database().ref('currentLive').set({
         trackUrl: '/' + year + '/live-' + timestampSuffix,
         geoJsonPath: 'gpsTracks/live-' + timestampSuffix,
-        lastUpdate: point.timestamp,
+        lastUpdate: moment.utc(point.timestamp).toISOString(),
         point: {
             longitude: parseFloat(point.longitude),
             latitude: parseFloat(point.latitude),
@@ -93,7 +93,7 @@ function updateLiveTrack(point, currentLive) {
         .download()
         .then(data => JSON.parse(data[0]))
         .then(content => {
-            content.features[0].properties.coordTimes.push(point.timestamp);
+            content.features[0].properties.coordTimes.push(moment.utc(point.timestamp).toISOString());
             content.features[0].geometry.coordinates.push([parseFloat(point.latitude), parseFloat(point.longitude), parseFloat(point.elevation)]);
             const geoJson = JSON.stringify(content);
             fs.writeFileSync(tempFilePath, geoJson);
@@ -103,7 +103,7 @@ function updateLiveTrack(point, currentLive) {
                     contentType: 'application/json'
                 }
             }).then(() => fs.unlinkSync(tempFilePath));
-            const updateCurrentLive = admin.database().ref('currentLive').child('lastUpdate').set(point.timestamp);
+            const updateCurrentLive = admin.database().ref('currentLive').child('lastUpdate').set(moment.utc(point.timestamp).toISOString());
             const updateCurrentLivePoint = admin.database().ref('currentLive').child('point').set({
                 longitude: parseFloat(point.longitude),
                 latitude: parseFloat(point.latitude),

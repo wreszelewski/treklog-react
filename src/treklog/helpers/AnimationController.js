@@ -147,7 +147,8 @@ export default class AnimationController {
         } else {
             const track = this.viewer.dataSources.get(1);
             this._headingRotation(track);
-            this.actions.updateAnimationProgress(JulianDate.secondsDifference(this.viewer.clock.currentTime, this.viewer.clock.startTime));        
+            const currentTime = this.geoJsonPath ? this.viewer.clock.currentTime : null
+            this.actions.updateAnimationProgress(JulianDate.secondsDifference(this.viewer.clock.currentTime, this.viewer.clock.startTime), currentTime);        
         }
     }
 
