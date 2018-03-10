@@ -12,7 +12,6 @@ export default class AnimationMenu extends Component {
 
     saveSettings() {
         this.setState(Object.assign({}, this.state, {showSettings: false}));
-        console.log(this.state);
         this.props.actions.animationSetSpeed(this.state.speed);
     }
 

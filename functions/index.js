@@ -93,7 +93,6 @@ function updateLiveTrack(point, currentLive) {
         .download()
         .then(data => JSON.parse(data[0]))
         .then(content => {
-            console.log(JSON.stringify(content));
             content.features[0].properties.coordTimes.push(point.timestamp);
             content.features[0].geometry.coordinates.push([parseFloat(point.latitude), parseFloat(point.longitude), parseFloat(point.elevation)]);
             const geoJson = JSON.stringify(content);

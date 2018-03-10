@@ -27,13 +27,11 @@ export default class AnimationController {
     }
 
     initialize(track) {
-        console.log(track);
         if(track.isLive) {
             this.geoJsonPath = track.geoJsonPath;
         } else {
             this.geoJsonPath = null;
         }
-        console.log(this.geoJsonPath);
         this.viewer.clock.clockRange = ClockRange.CLAMPED;
         this.viewer.clock.shouldAnimate = false;
         this.viewer.clock.currentTime = this.viewer.clock.startTime;

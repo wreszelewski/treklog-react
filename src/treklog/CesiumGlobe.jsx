@@ -110,7 +110,6 @@ class CesiumGlobe extends Component {
     }
 
     loadTrack(track) {
-        console.log(track);
         if(track.isLive) {
             this.registerLiveTrackListener(track);
         }
@@ -147,10 +146,6 @@ class CesiumGlobe extends Component {
             }
         }); 
 
-    }
-
-    flyToTrack(track) {
-        
     }
 
     getCesiumTerrainForGeoJson(geojson) {
