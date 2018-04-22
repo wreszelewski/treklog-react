@@ -1,19 +1,4 @@
-import {
-  FETCH_TRACK_STARTED,
-  FETCH_TRACK_FINISHED,
-  FETCH_TRACKS_FINISHED,
-  SHOW_TRACK_MENU,
-  HIDE_TRACK_MENU,
-  SHOW_TREKLOG_LOADER,
-  HIDE_TREKLOG_LOADER,
-  ANIMATION_PLAY,
-  ANIMATION_PAUSE,
-  ANIMATION_STOP,
-  ANIMATION_RESET,
-  ANIMATION_SET_SPEED,
-  UPDATE_ANIMATION_PROGRESS,
-  ANIMATION_PROGRESS_SET_TIME
-} from './actions'
+import * as actions from './actions'
 
 import _ from 'lodash';
 
@@ -36,38 +21,40 @@ const initialState = {
 
 function reducer(state = initialState, action) {
   switch (action.type) {
-    case FETCH_TRACK_STARTED:
+    case actions.FETCH_TRACK_STARTED:
         return Object.assign({}, state, {showLoader: true, showMenu: false, showBottomMenu: false});
-    case FETCH_TRACK_FINISHED:
+    case actions.FETCH_TRACK_FINISHED:
         return Object.assign({}, state, {track: action.track, showBottomMenu: true});
-    case FETCH_TRACKS_FINISHED:
+    case actions.FETCH_TRACKS_FINISHED:
         return Object.assign({}, state, {tracks: _.keyBy(action.tracks, 'url')});
-    case SHOW_TRACK_MENU:
+    case actions.SHOW_TRACK_MENU:
         return Object.assign({}, state, {showTrackMenu: true});
-    case HIDE_TRACK_MENU:
+    case actions.HIDE_TRACK_MENU:
         return Object.assign({}, state, {showTrackMenu: false});
-    case SHOW_TREKLOG_LOADER:
+    case actions.SHOW_TREKLOG_LOADER:
         return Object.assign({}, state, {showLoader: true});
-    case HIDE_TREKLOG_LOADER:
+    case actions.HIDE_TREKLOG_LOADER:
         return Object.assign({}, state, {showLoader: false});
-    case ANIMATION_PLAY:
+    case actions.ANIMATION_PLAY:
         return Object.assign({}, state, {animation: {reset: false, shouldPlay: true, shouldReplay: true, shouldBeInitialized: true, speed: state.animation.speed, currentTime: 0}});
-    case ANIMATION_PAUSE:
+    case actions.ANIMATION_PAUSE:
         return Object.assign({}, state, {animation: {shouldPlay: false, shouldBeInitialized: true, speed: state.animation.speed, currentTime: 0}});
-    case ANIMATION_STOP:
+    case actions.ANIMATION_STOP:
         return Object.assign({}, state, {animation: {shouldPlay: false, shouldBeInitialized: false, speed: state.animation.speed, currentTime: 0}});
-    case ANIMATION_RESET:
+    case actions.ANIMATION_RESET:
         return Object.assign({}, state, {animation: {reset: true, shouldPlay: false, shouldBeInitialized: false, speed: state.animation.speed, currentTime: 0}});
-    case ANIMATION_SET_SPEED:
+    case actions.ANIMATION_SET_SPEED:
         return Object.assign({}, state, {animation: {shouldPlay: state.animation.shouldPlay, shouldBeInitialized: state.animation.shouldBeInitialized, speed: parseInt(action.speed), currentTime: 0}})
-    case UPDATE_ANIMATION_PROGRESS:
+    case actions.UPDATE_ANIMATION_PROGRESS:
         return Object.assign({}, state, {animation: Object.assign({}, state.animation, {currentTime: action.currentRelativeTime, time: action.currentTime,  newTime: null, shouldReplay: false})});
-    case ANIMATION_PROGRESS_SET_TIME:
+    case actions.ANIMATION_PROGRESS_SET_TIME:
         if(Math.abs(state.animation.currentTime - action.newTime) > 2) {
             return Object.assign({}, state, {animation: Object.assign({}, state.animation, {newTime: action.newTime})});
         } else {
             return state;
         }
+    case actions.CESIUM_VIEWER_CREATED:
+        return Object.assign({}, state, {cesiumViewer: action.cesiumViewer});
     default:
       return state
   }

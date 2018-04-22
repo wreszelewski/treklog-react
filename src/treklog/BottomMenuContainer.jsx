@@ -7,6 +7,8 @@ import * as treklogActions from "./state/actions";
 const mapStateToProps = (state, ownProps) => {
     return {
       active: state.showBottomMenu,
+      track: state.track,
+      cesiumViewer: state.cesiumViewer
     }
   }
 

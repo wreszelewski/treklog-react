@@ -8,3 +8,13 @@
     background-color: rgba(0, 0, 0, 0.75);
     color: white;
 }
+
+.bottomMenu .bottomMenuButtons {
+    overflow: auto;
+    white-space: nowrap;
+    text-align: right;
+}
+
+.bottomMenu .bottomMenuButtons .buttons {
+    display: inline-block;
+}

@@ -67,6 +67,7 @@ class CesiumGlobe extends Component {
         }
 
         this.setState({viewerLoaded: true});
+        this.props.actions.cesiumViewerCreated(this.viewer);
     }
 
     registerLiveTrackListener(track) {

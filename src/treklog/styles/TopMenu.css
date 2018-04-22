@@ -1,6 +1,13 @@
 #topMenu {
     position: absolute;
     top: 5px;
-    right: 50px;
+    margin-left: 5px;
+    width: 85%;
+    overflow: auto;
+    white-space: nowrap;
     z-index: 1;
+}
+
+#topMenu::-webkit-scrollbar { 
+    display: none; 
 }

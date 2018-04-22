@@ -14,9 +14,13 @@ export function loadTrack(url, tracks, actions) {
     actions.fetchTrackStarted();
     actions.hideTrackMenu();
     let track = tracks[url];
-    return getPoints(track.geoJsonPath)
-        .then((geoJsonPoints) => {
+    if(!track.originalGeoJsonPath) {
+        track.originalGeoJsonPath = track.geoJsonPath;
+    }
+    return Promise.all([getPoints(track.geoJsonPath), getPoints(track.originalGeoJsonPath)])
+        .then(([geoJsonPoints, originalGeoJsonPoints]) => {
             track.geoJsonPoints = geoJsonPoints;
+            track.originalGeoJsonPoints = originalGeoJsonPoints;
             actions.fetchTrackFinished(track);
             actions.hideTreklogLoader();
         });
