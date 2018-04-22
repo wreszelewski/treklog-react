@@ -2,6 +2,9 @@ import React, {Component} from 'react'
 import { Progress } from 'semantic-ui-react'
 import {formatSeconds} from './helpers/time';
 import ReactDOM from 'react-dom';
+import moment from 'moment';
+import JulianDate from "cesium/Source/Core/JulianDate"
+
 
 
 export default class AnimationProgress extends Component {
@@ -37,23 +40,37 @@ export default class AnimationProgress extends Component {
     }
 
     componentDidMount() {
-        ReactDOM.findDOMNode(this.refs['animationProgress']).children[0].children[0].innerHTML = formatSeconds(this.props.animation.currentTime);
+        ReactDOM.findDOMNode(this.refs['animationProgress']).children[0].children[0].innerHTML = formatSeconds(this.props.animation.currentTime) || '';
+    }
+
+    formatTime(time) {
+        if(time) {
+            console.log()
+            return "Ostatnia aktualizacja: " + moment(JulianDate.toIso8601(time)).calendar();
+        }
     }
 
     componentDidUpdate() {
-        ReactDOM.findDOMNode(this.refs['animationProgress']).children[0].children[0].innerHTML = formatSeconds(this.props.animation.currentTime);
+        console.log(this.props.animation);
+        ReactDOM.findDOMNode(this.refs['animationProgress']).children[0].children[0].innerHTML = this.formatTime(this.props.animation.time) || formatSeconds(this.props.animation.currentTime) || '';
     }
 
     render() {
-        if(this.state.showMouseLabel) {
-            return (    
-                <Progress ref="animationProgress" total={this.props.track.duration / 1000} value={this.props.animation.currentTime} active={false} precision={10} autoSuccess={false} className="white" onClick={e => this.setTimeFromAnimationProgress(e)} onMouseMove={e => this.showMouseLabel(e)} onMouseLeave={e => this.hideMouseLabel(e)} progress>
-                        <div id="mouseLabel" style={{left: this.state.leftPosition}}>{this.state.labelText}</div>
-                </Progress>
-            );
+        if(this.props.track.duration) {
+            if(this.state.showMouseLabel) {
+                return (    
+                    <Progress ref="animationProgress" total={this.props.track.duration / 1000} value={this.props.animation.currentTime} active={false} precision={10} autoSuccess={false} className="white" onClick={e => this.setTimeFromAnimationProgress(e)} onMouseMove={e => this.showMouseLabel(e)} onMouseLeave={e => this.hideMouseLabel(e)} progress>
+                            <div id="mouseLabel" style={{left: this.state.leftPosition}}>{this.state.labelText}</div>
+                    </Progress>
+                );
+            } else {
+                return (    
+                    <Progress ref="animationProgress" total={this.props.track.duration / 1000} value={this.props.animation.currentTime} active={false} precision={10} autoSuccess={false} className="white" onClick={e => this.setTimeFromAnimationProgress(e)} onMouseMove={e => this.showMouseLabel(e)} onMouseLeave={e => this.hideMouseLabel(e)} progress />
+                );
+            }
         } else {
-            return (    
-                <Progress ref="animationProgress" total={this.props.track.duration / 1000} value={this.props.animation.currentTime} active={false} precision={10} autoSuccess={false} className="white" onClick={e => this.setTimeFromAnimationProgress(e)} onMouseMove={e => this.showMouseLabel(e)} onMouseLeave={e => this.hideMouseLabel(e)} progress />
+            return (
+                <Progress ref="animationProgress" total={100} value={100} active={false} precision={10} autoSuccess={false} className="white" progress />
             );
         }
     }

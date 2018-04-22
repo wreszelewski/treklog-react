@@ -24,3 +24,9 @@ yarn-error.log*
 functions/package-lock.json
 .vscode/settings.json
 .firebaserc
+firebase-debug.log
+package-lock.json
+package.json
+functions/firebase-debug.log
+functions/tmpTrack.geojson
+curlCommands

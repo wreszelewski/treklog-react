@@ -6,6 +6,8 @@ import ArcGisMapServerImageryProvider from "cesium/Source/Scene/ArcGisMapServerI
 import MapboxImageryProvider from "cesium/Source/Scene/MapboxImageryProvider";
 import CesiumTerrainProvider from "cesium/Source/Core/CesiumTerrainProvider";
 import Cartographic from "cesium/Source/Core/Cartographic";
+import Cartesian3 from "cesium/Source/Core/Cartesian3";
+import HeadingPitchRange from "cesium/Source/Core/HeadingPitchRange";
 import Color from "cesium/Source/Core/Color";
 import sampleTerrainMostDetailed from "cesium/Source/Core/sampleTerrainMostDetailed";
 import GeoJsonDataSource from "cesium/Source/DataSources/GeoJsonDataSource"
@@ -19,6 +21,8 @@ import {bindActionCreators} from 'redux';
 import * as treklogActions from "./state/actions";
 import JulianDate from "cesium/Source/Core/JulianDate"
 import config from "../config";
+import firebase from "firebase";
+import moment from "moment";
 
 class CesiumGlobe extends Component {
     state = {
@@ -49,8 +53,7 @@ class CesiumGlobe extends Component {
                 terrainProviderViewModels: [],
                 terrainExaggeration: 2.0,
                 fullscreenButton: false,
-                creditContainer: 'cesiumAttribution',
-                creditViewport: 'cesiumAttributionOverlay'
+                creditContainer: 'cesiumAttribution'
             });
             this.setState({animation: new AnimationController(this.viewer, this.props.actions)});
     
@@ -66,8 +69,50 @@ class CesiumGlobe extends Component {
         this.setState({viewerLoaded: true});
     }
 
+    registerLiveTrackListener(track) {
+        firebase.database().ref('/currentLive').on('value', (snapshot) => {
+            const currentLiveData = snapshot.val();
+            if(currentLiveData.trackUrl === track.url) {
+                if(this.viewer.dataSources.get(1)) {
+                    const time = new JulianDate.fromIso8601(currentLiveData.lastUpdate);
+                    const position = Cartesian3.fromDegrees(currentLiveData.point.longitude, currentLiveData.point.latitude, currentLiveData.point.elevation);
+                    const availability = JulianDate.toIso8601(this.viewer.clock.startTime) + '/' + moment(currentLiveData.lastUpdate).toISOString();
+                    const pathCarto = [new Cartographic.fromDegrees(currentLiveData.point.latitude, currentLiveData.point.longitude)];
+                    sampleTerrainMostDetailed(this.viewer.terrainProvider, pathCarto)
+                        .then(altitude => {
+                            return this.viewer.dataSources.get(1).process({
+                                id: 'path',
+                                availability: availability,
+                                position: {
+                                    cartographicDegrees: [currentLiveData.lastUpdate, currentLiveData.point.latitude, currentLiveData.point.longitude, (altitude[0].height*2)+4]
+                                }
+                            })
+                        })
+                        .then(data => {
+                            this.viewer.dataSources.get(1).process({
+                                id: 'document',
+                                clock: {
+                                    interval: availability,
+                                    currentTime: JulianDate.toIso8601(this.viewer.clock.currentTime),
+                                    multiplier: this.viewer.clock.multiplier
+        
+                                }
+                            })
+                        }).then(() => {
+                            this.viewer.clock.stopTime = JulianDate.fromIso8601(currentLiveData.lastUpdate);
+                            this.viewer.clock.shouldAnimate = true;
+                        });
+                }
+            } else {
+                firebase.database().ref('/currentLive').off();
+            }
+        });
+    }
+
     loadTrack(track) {
-        this.viewer.dataSources.removeAll();
+        if(track.isLive) {
+            this.registerLiveTrackListener(track);
+        }
         return this.getCesiumTerrainForGeoJson(track.geoJsonPoints).then((altitudeData) => {
             track.czmlAltitude = altitudeData;
             const geoJsonDs = GeoJsonDataSource.load(track.geoJsonPoints, {
@@ -80,6 +125,7 @@ class CesiumGlobe extends Component {
             const czmlDs = CzmlDataSource.load(czmlDoc);
             return Promise.all([geoJsonDs, czmlDs]);
         }).then(([geoJsonDs, czmlDs]) => {
+            this.viewer.dataSources.removeAll();
             const addGeoJson = this.viewer.dataSources.add(geoJsonDs);
             const addCzml = this.viewer.dataSources.add(czmlDs);
             return Promise.all([addGeoJson, addCzml]);
@@ -96,7 +142,7 @@ class CesiumGlobe extends Component {
                     maxiumumHeight: 10000
                 });
             } else {
-                return this.viewer.flyTo(addGeoJson);
+                return this.viewer.flyTo(addGeoJson, {offset: new HeadingPitchRange(0, -1.57, 4000)});
             }
         }); 
 

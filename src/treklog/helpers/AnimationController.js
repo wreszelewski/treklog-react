@@ -4,6 +4,9 @@ import ClockRange from "cesium/Source/Core/ClockRange"
 import JulianDate from "cesium/Source/Core/JulianDate"
 import CMath from "cesium/Source/Core/Math"
 import Cartesian3 from "cesium/Source/Core/Cartesian3"
+import { getPoints } from './trackLoader';
+import Color from "cesium/Source/Core/Color";
+
 
 export default class AnimationController {
     constructor(viewer, actions) {
@@ -20,9 +23,15 @@ export default class AnimationController {
         this.initialDestination = null;
         this.secondsDuration = 0;
         this.actions = actions;
+        this.geoJsonPath = null
     }
 
     initialize(track) {
+        if(track.isLive) {
+            this.geoJsonPath = track.geoJsonPath;
+        } else {
+            this.geoJsonPath = null;
+        }
         this.viewer.clock.clockRange = ClockRange.CLAMPED;
         this.viewer.clock.shouldAnimate = false;
         this.viewer.clock.currentTime = this.viewer.clock.startTime;
@@ -91,8 +100,22 @@ export default class AnimationController {
 
     stop() {
         this.reset();
-        this.viewer.dataSources.get(1).show = false;
-        this.viewer.dataSources.get(0).show = true;
+        if(this.geoJsonPath) {
+            getPoints(this.geoJsonPath).then(trackPoints => {
+                this.viewer.dataSources.get(0).load(trackPoints, {
+                    stroke: new Color(0.98, 0.75, 0.18),
+                    fill: new Color(0.98, 0.75, 0.18),
+                    strokeWidth: 20,
+                    clampToGround: true
+                });
+            }).then(() => {
+                this.viewer.dataSources.get(1).show = false;
+                this.viewer.dataSources.get(0).show = true
+            });
+        } else {
+            this.viewer.dataSources.get(1).show = false;
+            this.viewer.dataSources.get(0).show = true;
+        }
         this.viewer.trackedEntity = null;
         this.viewer.clock.currentTime = this.viewer.clock.startTime;
         if(this.initialDestination && this.initialOrientation) {
@@ -124,7 +147,8 @@ export default class AnimationController {
         } else {
             const track = this.viewer.dataSources.get(1);
             this._headingRotation(track);
-            this.actions.updateAnimationProgress(JulianDate.secondsDifference(this.viewer.clock.currentTime, this.viewer.clock.startTime));        
+            const currentTime = this.geoJsonPath ? this.viewer.clock.currentTime : null
+            this.actions.updateAnimationProgress(JulianDate.secondsDifference(this.viewer.clock.currentTime, this.viewer.clock.startTime), currentTime);        
         }
     }
 

@@ -22,7 +22,7 @@ export function loadTrack(url, tracks, actions) {
         });
 }
 
-function getPoints(geoJsonPath) {
+export function getPoints(geoJsonPath) {
     const storage = firebase.storage();
     return storage.ref(geoJsonPath)
         .getDownloadURL()

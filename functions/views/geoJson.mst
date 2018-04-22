@@ -1,0 +1,20 @@
+{"type":
+    "FeatureCollection",
+    "features":[
+        {
+            "type":"Feature",
+            "properties": {
+                "name":"Na żywo",
+                "time":"{{{point.timestamp}}}",
+                "coordTimes":["{{{point.timestamp}}}"]
+            },
+            "geometry":{
+                "type":"LineString",
+                "coordinates":[
+                    [{{{point.latitude}}},{{{point.longitude}}},{{{point.elevation}}}]
+                ]
+            }
+            
+        }
+    ]
+}
