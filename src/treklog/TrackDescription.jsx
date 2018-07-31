@@ -31,7 +31,10 @@ export default class TrackDescription extends Component {
   saveTrackName(ev) {
       const oldUrl = this.props.track.url;
       const newName = ev.target.value;
-      const newUrl = (['/' + oldUrl.split('/')[1], newName]).join('/').toLowerCase();
+      const newUrl = (['/' + oldUrl.split('/')[1], newName]).join('/').toLowerCase()
+        .replace(' ', '-')
+        .replace('ą', 'a')
+        .replace('ó', 'o');
       let updates = this.props.track;
       updates['name'] = newName;
       updates['url'] = newUrl;
