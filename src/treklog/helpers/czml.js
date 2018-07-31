@@ -47,6 +47,7 @@ function fromGeoJson(geojson, altitude, multiplier = 300) {
                     eyeOffset: {
                         "cartesian": [ 0.0, 0.0, -30.0 ]
                     },
+                    heightReference: "CLAMP_TO_GROUND"
                 },
                 position: {
                     cartographicDegrees: czmlPath

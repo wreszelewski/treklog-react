@@ -7,8 +7,9 @@ export default class TrackCalculator {
     constructor(originalGeoJson, altitude) {
         this.altitude = altitude;
         this.originalGeoJson = originalGeoJson;
-        this._coordinates = this._getCoordinates();
+        this._originalCoordinates = this._getCoordinates(originalGeoJson);
         this._coordTimes = this._getCoordTimes();
+        this._coordinates = this._getCoordinates(this.filteredTrack);
         this.name;
         this.description;
         this.hash = SparkMD5.hash(JSON.stringify(originalGeoJson));
@@ -19,13 +20,13 @@ export default class TrackCalculator {
         };
     }
 
-    _getCoordinates() {
+    _getCoordinates(geoJson) {
         let coordinates;
-        if(this.originalGeoJson.features[0].geometry.type === 'LineString') {
-            coordinates = this.originalGeoJson.features[0].geometry.coordinates;
+        if(geoJson.features[0].geometry.type === 'LineString') {
+            coordinates = geoJson.features[0].geometry.coordinates;
         } else {
             coordinates = []
-            this.originalGeoJson.features[0].geometry.coordinates.forEach(coordArray => {coordinates = coordinates.concat(coordArray)});
+            geoJson.features[0].geometry.coordinates.forEach(coordArray => {coordinates = coordinates.concat(coordArray)});
         }
         if(coordinates.length === this.altitude.length) {
             for(let i = 0; i < coordinates.length; i++) {
@@ -130,10 +131,7 @@ export default class TrackCalculator {
                     properties: {
                         name: this.name,
                         time: this.originalGeoJson.features[0].properties.time,
-                        coordTimes: [],
-                        links: [{
-                            href: this.originalGeoJson.features[0].properties.links[0].href
-                        }]
+                        coordTimes: []
                     },
                     geometry: {
                         type: 'LineString',
@@ -163,20 +161,38 @@ export default class TrackCalculator {
     get filteredTrack() {
         let lightGeoJson = this._getGeoJsonWithoutPoints();
     
-        const coordinates = this._coordinates;
+        const coordinates = this._originalCoordinates;
         const coordTimes = this._coordTimes;    
     
         this._pushPointToTrack(lightGeoJson, 0)
     
         let lastPoint = getGeolibPoint(coordinates[0]);
-        let currentPoint, currentDistance;
+        let lastTimestamp = coordTimes[0];
+        let currentPoint, currentDistance, currentSpeed, currentTimeSpan;
     
         coordinates.slice(1).forEach((point, index) => {
             currentPoint = getGeolibPoint(coordinates[index+1]);
             currentDistance = geolib.getDistance(lastPoint, currentPoint);
-            if(currentDistance > 25) {
+            currentTimeSpan = (moment(coordTimes[index+1]) - moment(lastTimestamp)) / 1000;
+            currentSpeed = currentDistance / currentTimeSpan;
+
+            if(currentDistance > 25 && currentSpeed > 0 && currentSpeed < 5) {
+                if(currentDistance > 200) {
+                    let bearing = geolib.getBearing(lastPoint, currentPoint);
+                    let steps = currentDistance / 50;
+                    let step = 1;
+                    let timeStep = currentTimeSpan / steps;
+                    while(currentDistance > 50) {
+                        let additionalPoint = geolib.computeDestinationPoint(lastPoint, 50 * step, bearing);
+                        lightGeoJson.features[0].geometry.coordinates.push([additionalPoint.longitude, additionalPoint.latitude, 0]);
+                        lightGeoJson.features[0].properties.coordTimes.push(moment(lastTimestamp).add((Math.round(timeStep*step)), 's').toISOString());
+                        step += 1;
+                        currentDistance = geolib.getDistance(additionalPoint, currentPoint);
+                    }
+                }
                 this._pushPointToTrack(lightGeoJson, index+1);
                 lastPoint = currentPoint;
+                lastTimestamp = coordTimes[index+1];
             }
     
         })
@@ -184,7 +200,7 @@ export default class TrackCalculator {
     }
 
     _pushPointToTrack(track, index) {
-        track.features[0].geometry.coordinates.push(this._coordinates[index]);
+        track.features[0].geometry.coordinates.push(this._originalCoordinates[index]);
         track.features[0].properties.coordTimes.push(this._coordTimes[index]);
     }
 

@@ -36,7 +36,12 @@ export default class BottomMenuButtons extends Component {
         updates['descent'] = Math.round(altitudeStats.descent);
         updates['maxAltitude'] = Math.round(altitudeStats.maxAltitude);
         updates['minAltitude'] = Math.round(altitudeStats.minAltitude);
-        return firebase.database().ref('tracks' + this.props.track.url).update(updates);
+        return firebase.storage().ref(this.props.track.geoJsonPath).putString(JSON.stringify(trackCalc.filteredTrack), undefined, {
+            contentType: 'application/json'
+        }).then(() => {
+            return firebase.database().ref('tracks' + this.props.track.url).update(updates);
+        }); 
+        
     }
 
 
@@ -134,6 +139,36 @@ export default class BottomMenuButtons extends Component {
         });
     }
 
+    finishLive() {
+        const trackCalc = new TrackCalculator(this.props.track.originalGeoJsonPoints, this.props.track.czmlAltitude);
+        const altitudeStats = trackCalc.altitudeStats
+        let updates = {}
+        updates['isLive'] = false;
+        updates['geoJsonPoints'] = {};
+        updates['originalGeoJsonPoints'] = {};
+        updates['originalGeoJsonPath'] = trackCalc.originalGeoJsonPath
+        updates['geoJsonPath'] = trackCalc.geoJsonPath
+
+        return firebase.storage().ref(this.props.track.geoJsonPath).getDownloadURL()
+            .then(path => {
+                const geoJsonReq = new Request(path);
+                return fetch(geoJsonReq)
+            }).then(geojsonFile => geojsonFile.blob())
+            .then(geojsonFile => {
+                return Promise.all([
+                    firebase.storage().ref(trackCalc.originalGeoJsonPath).put(geojsonFile),
+                    firebase.storage().ref(trackCalc.geoJsonPath).put(geojsonFile)
+                ]);
+            }).then(() => {
+                return Promise.all([
+                    firebase.database().ref('tracks' + this.props.track.url).update(updates),
+                    firebase.database().ref('currentLive').set({})
+                ]);
+
+            });
+
+    }
+
     render() {
         if(this.state.isLoggedIn) {
                 return (    
@@ -141,7 +176,7 @@ export default class BottomMenuButtons extends Component {
                     <Button inverted size="small" style={{marginRight: "10px", marginLeft: "10px", marginTop: "5px"}} onClick={this.setSocialImage.bind(this)}>Ustaw obrazek</Button>
                     <Button inverted size="small" style={{marginRight: "10px", marginLeft: "10px", marginTop: "5px"}} onClick={this.setInitialPosition.bind(this)}>Ustaw pozycję</Button>
                     <Button inverted size="small" style={{marginRight: "10px", marginLeft: "10px", marginTop: "5px"}} onClick={this.recalculateTrack.bind(this)}>Przelicz trasę</Button>
-                    <Button inverted size="small" style={{marginRight: "10px", marginLeft: "10px", marginTop: "5px"}}>Zakończ live</Button>
+                    <Button inverted size="small" style={{marginRight: "10px", marginLeft: "10px", marginTop: "5px"}} onClick={this.finishLive.bind(this)}>Zakończ live</Button>
                     </div>
                 )
             } else {
