@@ -51,12 +51,12 @@ class CesiumGlobe extends Component {
                 clockViewModel: null,
                 imageryProviderViewModels: this.getImageryProviders(config),
                 terrainProviderViewModels: [],
-                terrainExaggeration: 2.0,
+                terrainExaggeration: 1.0,
                 fullscreenButton: false,
                 creditContainer: 'cesiumAttribution'
             });
             this.setState({animation: new AnimationController(this.viewer, this.props.actions)});
-    
+            this.viewer.scene.globe.baseColor = new Color(0.44, 0.26, 0.08, 1);
             this.viewer.terrainProvider = new CesiumTerrainProvider({
                 url: 'https://assets.agi.com/stk-terrain/world',
                 requestWaterMask: false,
@@ -117,9 +117,9 @@ class CesiumGlobe extends Component {
         return this.getCesiumTerrainForGeoJson(track.geoJsonPoints).then((altitudeData) => {
             track.czmlAltitude = altitudeData;
             const geoJsonDs = GeoJsonDataSource.load(track.geoJsonPoints, {
-                stroke: new Color(0.98, 0.75, 0.18),
-                fill: new Color(0.98, 0.75, 0.18),
-                strokeWidth: 20,
+                stroke: new Color(0.96, 0.94, 0.59),
+                fill: new Color(0.96, 0.94, 0.59),
+                strokeWidth: 50,
                 clampToGround: true
             });
             const czmlDoc = czml.fromGeoJson(track.geoJsonPoints, track.czmlAltitude)
@@ -227,9 +227,14 @@ class CesiumGlobe extends Component {
             tooltip: "Esri World Imagery",
             iconUrl: "/assets/img/baseLayerPicker/esriWorldImagery.png",
             creationFunction: () => {
-                return new ArcGisMapServerImageryProvider({
+                const provider = new ArcGisMapServerImageryProvider({
                     url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
                 });
+                provider.defaultSaturation = 0.4;
+                provider.defaultAlpha = 0.6;
+                provider.defaultContrast = 2.0;
+                provider.defaultBrightness = 1;
+                return provider;
             }
         }));
 
