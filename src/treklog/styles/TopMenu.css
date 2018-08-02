@@ -11,3 +11,14 @@
 #topMenu::-webkit-scrollbar { 
     display: none; 
 }
+
+#topMenu .ui.inverted.button {
+    color: #FFEFCE;
+    box-shadow: 0 0 0 2px #FFEFCE inset!important;
+}
+
+#topMenu .ui.inverted.button:hover {
+    background-color: #FFEFCE;
+    color: rgba(0,0,0,0.6);
+    box-shadow: 0 0 0 2px #FFEFCE inset!important;
+}

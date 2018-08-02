@@ -4,6 +4,10 @@
     padding: 0;
 }
 
+#animationMenu .ui.inverted.icon.menu .item {
+    color: #FFEFCE;
+}
+
 .ui.progress:first-child {
     margin: 0;
 }
@@ -14,18 +18,19 @@
 }
 
 .ui.progress .bar {
-    background: white;
+    background: #FFEFCE;
     min-width: 3px;
     height: 31px;
 }
 
 .movieMenu {
-    background-color: rgba(0,0,0, 0.7)
+    background: transparent;
 }
 
 .movieMenu .ui.progress {
     margin: 0 0  0 149px;
     cursor: pointer;
+    background: transparent;
 }
 
 .ui.progress .bar>.progress {

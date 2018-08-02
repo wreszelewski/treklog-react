@@ -1,0 +1,3 @@
+kolor: #ffe57e
+
+linear-gradient(to top, rgba(0,0,0,0.35), 95%, rgba(0,0,0,0));

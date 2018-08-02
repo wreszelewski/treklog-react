@@ -7,6 +7,7 @@ import MapboxImageryProvider from "cesium/Source/Scene/MapboxImageryProvider";
 import CesiumTerrainProvider from "cesium/Source/Core/CesiumTerrainProvider";
 import Cartographic from "cesium/Source/Core/Cartographic";
 import Cartesian3 from "cesium/Source/Core/Cartesian3";
+import Rectangle from "cesium/Source/Core/Rectangle";
 import HeadingPitchRange from "cesium/Source/Core/HeadingPitchRange";
 import Color from "cesium/Source/Core/Color";
 import sampleTerrainMostDetailed from "cesium/Source/Core/sampleTerrainMostDetailed";
@@ -23,6 +24,7 @@ import JulianDate from "cesium/Source/Core/JulianDate"
 import config from "../config";
 import firebase from "firebase";
 import moment from "moment";
+import Camera from 'cesium/Source/Scene/Camera'
 
 class CesiumGlobe extends Component {
     state = {
@@ -36,6 +38,15 @@ class CesiumGlobe extends Component {
     componentDidMount() {
 
         if(!this.state.viewerLoaded) {
+            var west = -28.0;
+            var south = 48.0;
+            var east = 69.0;
+            var north = 49.0;
+            
+            var rectangle = Rectangle.fromDegrees(west, south, east, north);
+            
+            Camera.DEFAULT_VIEW_FACTOR = 0;
+            Camera.DEFAULT_VIEW_RECTANGLE = rectangle;
 
             this.viewer = new Viewer(this.cesiumContainer, {
                 scene3DOnly: true,
@@ -56,7 +67,7 @@ class CesiumGlobe extends Component {
                 creditContainer: 'cesiumAttribution'
             });
             this.setState({animation: new AnimationController(this.viewer, this.props.actions)});
-            this.viewer.scene.globe.baseColor = new Color(0.44, 0.26, 0.08, 1);
+            this.viewer.scene.globe.baseColor = new Color.fromCssColorString('#ce841c'); 
             this.viewer.terrainProvider = new CesiumTerrainProvider({
                 url: 'https://assets.agi.com/stk-terrain/world',
                 requestWaterMask: false,
@@ -117,8 +128,7 @@ class CesiumGlobe extends Component {
         return this.getCesiumTerrainForGeoJson(track.geoJsonPoints).then((altitudeData) => {
             track.czmlAltitude = altitudeData;
             const geoJsonDs = GeoJsonDataSource.load(track.geoJsonPoints, {
-                stroke: new Color(0.96, 0.94, 0.59),
-                fill: new Color(0.96, 0.94, 0.59),
+                stroke: Color.fromCssColorString('#f4d797'),
                 strokeWidth: 50,
                 clampToGround: true
             });
@@ -139,8 +149,9 @@ class CesiumGlobe extends Component {
                 
                  return this.viewer.camera.flyTo({
                     destination,
-                    orientation,
-                    maxiumumHeight: 10000
+                    //orientation,
+                    maxiumumHeight: 20000,
+                    duration: 3
                 });
             } else {
                 return this.viewer.flyTo(addGeoJson, {offset: new HeadingPitchRange(0, -1.57, 4000)});
@@ -230,10 +241,10 @@ class CesiumGlobe extends Component {
                 const provider = new ArcGisMapServerImageryProvider({
                     url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
                 });
-                provider.defaultSaturation = 0.4;
+                provider.defaultSaturation = 0.0;
                 provider.defaultAlpha = 0.6;
-                provider.defaultContrast = 2.0;
-                provider.defaultBrightness = 1;
+                provider.defaultContrast = 2.8;
+                provider.defaultBrightness = 0.8;
                 return provider;
             }
         }));
