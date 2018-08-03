@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 
 
 import CesiumGlobe from "./treklog/CesiumGlobe";
+import AddTrackContainer from "./treklog/AddTrackContainer";
 import TrackMenuContainer from "./treklog/TrackMenuContainer"
 import TopMenu from "./treklog/TopMenu"
 import TreklogLoaderContainer from "./treklog/TreklogLoaderContainer"
@@ -13,6 +14,7 @@ import { connect } from 'react-redux'
 import {bindActionCreators} from 'redux';
 import { getTracks } from './treklog/helpers/trackLoader';
 import _ from 'lodash';
+import AddTrack from "./treklog/AddTrack";
 
 
 class App extends Component {
@@ -31,6 +33,7 @@ class App extends Component {
             <div>
                 <CesiumGlobe />
                 <TopMenu />
+                <AddTrackContainer/>
                 <TrackMenuContainer />
                 <BottomMenuContainer />
                 <CesiumAttribution />

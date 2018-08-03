@@ -50,7 +50,7 @@ class TopMenu extends ReactQueryParams {
         
             if(this.state.isLoggedIn) {
                 return(<div id="topMenu">
-                <Button size="large" inverted onClick={this.login}>Dodaj</Button>
+                <Button size="large" inverted onClick={this.props.actions.showAddTrack}>Dodaj</Button>
                 <Button size="large" inverted onClick={this.logout}>Wyloguj</Button>
                 <Button icon size="large" inverted onClick={this.shareToFb}><Icon name="facebook f" />Podziel się</Button>
                 <Button size="large" inverted onClick={this.props.actions.showTrackMenu}>Menu</Button>

@@ -1,10 +1,20 @@
 const moment = require('moment');
 const geolib = require('geolib');
+const toGeoJson = require('togeojson');
 const SparkMD5 = require('spark-md5');
+const firebase = require('firebase');
+const slugify = require('slugify');
 
 export default class TrackCalculator {
 
-    constructor(originalGeoJson, altitude) {
+	static fromGpx(gpxString) {
+		const gpx = (new DOMParser()).parseFromString(gpxString, 'text/xml', null, 4);
+		const geojson = toGeoJson.gpx(gpx);
+		const track = new TrackCalculator(geojson);
+		return track;
+	}
+
+    constructor(originalGeoJson, altitude = []) {
         this.altitude = altitude;
         this.originalGeoJson = originalGeoJson;
         this._originalCoordinates = this._getCoordinates(originalGeoJson);
@@ -54,6 +64,10 @@ export default class TrackCalculator {
     get duration() {
         return moment(this._coordTimes[this._coordTimes.length - 1]) - moment(this._coordTimes[0]);
     }
+
+	get url() {
+		return '/' + this.date.year() + '/' + slugify(this.name, {lower: true});
+	}
 
     get altitudeStats() {
         const coordinates = this._coordinates;
@@ -221,6 +235,31 @@ export default class TrackCalculator {
         return trackToSave;
     }
 
+	store() {
+		const data = this._serialize();
+		return storeTrack(data, this.filteredTrack, this.originalGeoJson);
+	}
+
+}
+
+function storeTrack(data, filteredTrack, originalTrack) {
+	const metadata = {
+		contentType: 'application/json',
+	};
+	return storeFile(data.geoJsonPath, filteredTrack, metadata)
+		.then(() => {
+			return storeFile(data.originalGeoJsonPath, originalTrack, metadata);
+		}).then(() => {
+			return storeTrackMetadata(data.url, data);
+		});
+}
+
+function storeFile(path, content, metadata) {
+	return firebase.storage().ref().child(path).putString(JSON.stringify(content), 'raw', metadata);
+}
+
+function storeTrackMetadata(path, data) {
+	return firebase.database().ref('tracks' + path).set(data);
 }
 
 function getGeolibPoint(coordinate) {
