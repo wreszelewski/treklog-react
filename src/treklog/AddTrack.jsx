@@ -58,7 +58,7 @@ export default class AddTrack extends Component {
     render() {
 		if(this.state.redirect) {
 			return (
-				<Redirect to={this.state.trackUrl}/>
+				<Redirect to={this.state.trackUrl} push={true}/>
 			)
 		}
         return (
