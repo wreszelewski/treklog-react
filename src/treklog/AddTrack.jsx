@@ -8,6 +8,8 @@ import {Redirect} from "react-router";
 export default class AddTrack extends Component {
 
     handleClose = this.props.actions.hideAddTrack;
+    showLoader = this.props.actions.showTreklogLoader;
+    hideLoader = this.props.actions.hideTreklogLoader;
 
     state = {
     	trackName: "",
@@ -30,6 +32,7 @@ export default class AddTrack extends Component {
 	}
 
 	saveTrack() {
+    	this.showLoader();
 		const selectedFile = document.getElementById('input').files[0];
 		const reader = new FileReader();
 
