@@ -1,4 +1,5 @@
-import BottomMenu from './BottomMenu';
+import './styles/TrackMenu.css';
+import AddTrack from './AddTrack';
 import { connect } from 'react-redux';
 import {bindActionCreators} from 'redux';  
 import * as treklogActions from "./state/actions";
@@ -6,9 +7,7 @@ import * as treklogActions from "./state/actions";
 
 const mapStateToProps = (state, ownProps) => {
     return {
-      active: state.showBottomMenu,
-      track: state.track,
-      cesiumViewer: state.cesiumViewer
+      open: state.showAddTrack
     }
   }
 
@@ -16,9 +15,10 @@ const mapStateToProps = (state, ownProps) => {
     return {actions: bindActionCreators(treklogActions, dispatch)};
 }
 
-  const BottomMenuContainer = connect(
+  const AddTrackContainer = connect(
     mapStateToProps,
     mapDispatchToProps
-  )(BottomMenu)
+  )(AddTrack)
   
-  export default BottomMenuContainer
+  export default AddTrackContainer
+  

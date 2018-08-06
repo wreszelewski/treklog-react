@@ -16,12 +16,31 @@
     margin-top: 0;
 }
 
+.trackDescription input {
+    display: inline;
+    margin: 5px auto;
+    border: none;
+    background-color: rgba(255,255,255, 0.5);
+    color: white;
+    text-align: center;
+}
+
+.trackDescription #trackName {
+    font-size: 2.4rem;  
+}
+
+.trackDescription #trackDesc {
+    font-size: 1.2rem;
+    width: 90%;
+}
+
 .trackStats {
     clear: both;
 }
 
 .ui.label.singleStat {
     margin-bottom: 5px;
+    background-color: #FFEFCE;
 }
 
 .movieMenu-btn {

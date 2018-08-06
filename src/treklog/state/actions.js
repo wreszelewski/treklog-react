@@ -6,6 +6,9 @@ export const FETCH_TRACKS_FINISHED = 'FETCH_TRACKS_FINISHED';
 export const SHOW_TRACK_MENU = 'SHOW_TRACK_MENU';
 export const HIDE_TRACK_MENU = 'HIDE_TRACK_MENU';
 
+export const SHOW_ADD_TRACK = 'SHOW_ADD_TRACK';
+export const HIDE_ADD_TRACK = 'HIDE_ADD_TRACK';
+
 export const SHOW_TREKLOG_LOADER = 'SHOW_TREKLOG_LOADER';
 export const HIDE_TREKLOG_LOADER = 'HIDE_TREKLOG_LOADER';
 
@@ -18,6 +21,8 @@ export const ANIMATION_SET_SPEED = 'ANIMATION_SET_SPEED';
 export const UPDATE_ANIMATION_PROGRESS = 'UPDATE_ANIMATION_PROGRESS';
 export const ANIMATION_PROGRESS_SET_TIME = 'ANIMATION_PROGRESS_SET_TIME';
 
+export const CESIUM_VIEWER_CREATED = 'CESIUM_VIEWER_CREATED';
+
 export function fetchTrackStarted() {
   return { type: FETCH_TRACK_STARTED }
 }
@@ -28,6 +33,14 @@ export function fetchTrackFinished(track) {
 
 export function fetchTracksFinished(tracks) {
   return { type: FETCH_TRACKS_FINISHED, tracks}
+}
+
+export function showAddTrack() {
+	return { type: SHOW_ADD_TRACK };
+}
+
+export function hideAddTrack() {
+	return { type: HIDE_ADD_TRACK};
 }
 
 export function showTrackMenu() {
@@ -72,4 +85,8 @@ export function updateAnimationProgress(currentRelativeTime, currentTime) {
 
 export function animationProgressSetTime(newTime) {
   return { type: ANIMATION_PROGRESS_SET_TIME, newTime};
+}
+
+export function cesiumViewerCreated(cesiumViewer) {
+  return { type: CESIUM_VIEWER_CREATED, cesiumViewer};
 }

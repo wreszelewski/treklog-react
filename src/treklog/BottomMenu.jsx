@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 import AnimationMenuContainer from './AnimationMenuContainer';
 import TrackDescriptionContainer from './TrackDescriptionContainer';
+import BottomMenuButtons from './BottomMenuButtons';
 import {Button} from 'semantic-ui-react';
 
 import './styles/BottomMenu.css';
@@ -22,15 +23,21 @@ export default class BottomMenu extends Component {
                     <div className="bottomMenu">
                         <AnimationMenuContainer />
                         <TrackDescriptionContainer />
-                        <Button inverted size="small" style={{float: "right", marginRight: "10px", marginTop: "5px"}} onClick={this.toggleDescription.bind(this)}>Zwiń opis</Button>
-                    </div>
+                        <div className="bottomMenuButtons">
+                            <BottomMenuButtons track = {this.props.track} cesiumViewer={this.props.cesiumViewer}/>
+                            <Button inverted size="small" style={{marginRight: "10px", marginLeft: "10px", marginTop: "5px"}} onClick={this.toggleDescription.bind(this)}>Zwiń opis</Button>
+                        </div>
+                        </div>
                 
                 )
             } else {
                 return (    
                     <div className="bottomMenu">
                         <AnimationMenuContainer />
-                        <Button inverted size="small" style={{float: "right", marginRight: "10px", marginTop: "5px"}} onClick={this.toggleDescription.bind(this)}>Pokaż opis</Button>
+                        <div className="bottomMenuButtons">
+                            <BottomMenuButtons track={this.props.track} cesiumViewer={this.props.cesiumViewer}/>
+                            <Button inverted size="small" style={{marginRight: "10px", marginLeft: "10px", marginTop: "5px"}} onClick={this.toggleDescription.bind(this)}>Pokaż opis</Button>
+                        </div>
                     </div>
                 
                 )

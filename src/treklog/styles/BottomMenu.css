@@ -5,6 +5,27 @@
     text-align: center;
     width: 100%;
     padding-bottom: 30px;
-    background-color: rgba(0, 0, 0, 0.75);
-    color: white;
+    background: linear-gradient(to top, rgba(0,0,0,0.7), 80%, rgba(0,0,0,0));
+    color: #FFEFCE;
+}
+
+.bottomMenu .bottomMenuButtons {
+    overflow: auto;
+    white-space: nowrap;
+    text-align: right;
+}
+
+.bottomMenu .bottomMenuButtons .buttons {
+    display: inline-block;
+}
+
+.bottomMenu .bottomMenuButtons .ui.inverted.button {
+    color: #FFEFCE;
+    box-shadow: 0 0 0 2px #FFEFCE inset!important;    
+}
+
+.bottomMenu .bottomMenuButtons .ui.inverted.button:hover {
+    background-color: #FFEFCE;
+    color: rgba(0,0,0,0.6);
+    box-shadow: 0 0 0 2px #FFEFCE inset!important;
 }

@@ -51,7 +51,6 @@ export default class AnimationProgress extends Component {
     }
 
     componentDidUpdate() {
-        console.log(this.props.animation);
         ReactDOM.findDOMNode(this.refs['animationProgress']).children[0].children[0].innerHTML = this.formatTime(this.props.animation.time) || formatSeconds(this.props.animation.currentTime) || '';
     }
 
