@@ -2,7 +2,7 @@ const functions = require('firebase-functions');
 const admin = require("firebase-admin");
 const gcs = require('@google-cloud/storage')();
 
-admin.initializeApp(functions.config().firebase);
+admin.initializeApp();
 const Mustache = require('mustache');
 const fs = require('fs');
 const path = require('path');

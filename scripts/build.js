@@ -43,24 +43,24 @@ if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
   process.exit(1);
 }
 
-let cesiumDllBuild = Promise.resolve();
-if(!checkRequiredFiles([paths.cesiumDll])) {
-  const compile = require("./webpackCompile");
-  
-  
-  const cesiumConfig = require('../config/webpack.cesium.dll.config.js');
-  
-  compile("cesium", cesiumConfig)
-      .then( ({stats}) => {
-  });
-  cesiumDllBuild = compile("cesium", cesiumConfig)
-  .then( ({stats}) => {});
-}
+
 
 // First, read the current file sizes in build directory.
 // This lets us display how much they changed later.
 function makeBuild() {
-  
+  let cesiumDllBuild = Promise.resolve();
+  if(!checkRequiredFiles([paths.cesiumDll])) {
+    const compile = require("./webpackCompile");
+    
+    
+    const cesiumConfig = require('../config/webpack.cesium.dll.config.js');
+    
+    compile("cesium", cesiumConfig)
+        .then( ({stats}) => {
+    });
+    cesiumDllBuild = compile("cesium", cesiumConfig)
+    .then( ({stats}) => {});
+  }
 
 return measureFileSizesBeforeBuild(paths.appBuild)
   .then(previousFileSizes => {
