@@ -57,5 +57,6 @@ module.exports = {
   appConfig : resolveApp('config'),
   cesiumDebugBuild : resolveApp('node_modules/cesium/Build/CesiumUnminified/'),
   cesiumProdBuild : resolveApp('node_modules/cesium/Build/Cesium/'),
-  cesiumSourceFolder : resolveApp('node_modules/cesium/Source/')
+  cesiumSourceFolder : resolveApp('node_modules/cesium/Source/'),
+  cesiumDll : resolveApp('distdll/cesiumDll.js')
 };

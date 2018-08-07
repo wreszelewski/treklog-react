@@ -18,9 +18,9 @@ const path = require('path');
 const chalk = require('chalk');
 const fs = require('fs-extra');
 const webpack = require('webpack');
-const config = require('../config/webpack.config.prod');
-const paths = require('../config/paths');
 const checkRequiredFiles = require('react-dev-utils/checkRequiredFiles');
+
+const paths = require('../config/paths');
 const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
 const printHostingInstructions = require('react-dev-utils/printHostingInstructions');
 const FileSizeReporter = require('react-dev-utils/FileSizeReporter');
@@ -36,27 +36,50 @@ const useYarn = fs.existsSync(paths.yarnLockFile);
 const WARN_AFTER_BUNDLE_GZIP_SIZE = 512 * 1024;
 const WARN_AFTER_CHUNK_GZIP_SIZE = 1024 * 1024;
 
+let config = {};
+
 // Warn and crash if required files are missing
 if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
   process.exit(1);
 }
 
+let cesiumDllBuild = Promise.resolve();
+if(!checkRequiredFiles([paths.cesiumDll])) {
+  const compile = require("./webpackCompile");
+  
+  
+  const cesiumConfig = require('../config/webpack.cesium.dll.config.js');
+  
+  compile("cesium", cesiumConfig)
+      .then( ({stats}) => {
+  });
+  cesiumDllBuild = compile("cesium", cesiumConfig)
+  .then( ({stats}) => {});
+}
+
 // First, read the current file sizes in build directory.
 // This lets us display how much they changed later.
-measureFileSizesBeforeBuild(paths.appBuild)
+function makeBuild() {
+  
+
+return measureFileSizesBeforeBuild(paths.appBuild)
   .then(previousFileSizes => {
-    // Remove all content but keep the directory so that
-    // if you're in it, you don't end up in Trash
-    fs.emptyDirSync(paths.appBuild);
-    // Merge with the public folder
-    copyPublicFolder();
-    copyCesium();
-    // Start the webpack build
-    return build(previousFileSizes);
+    return cesiumDllBuild.then(() => {
+      config = require('../config/webpack.config.prod');      
+      // Remove all content but keep the directory so that
+      // if you're in it, you don't end up in Trash
+      fs.emptyDirSync(paths.appBuild);
+      // Merge with the public folder
+      copyPublicFolder();
+      copyCesium();
+      // Start the webpack build
+      return build(previousFileSizes);
+    })
   })
   .then(
     ({ stats, previousFileSizes, warnings }) => {
       if (warnings.length) {
+        
         console.log(chalk.yellow('Compiled with warnings.\n'));
         console.log(warnings.join('\n\n'));
         console.log(
@@ -101,11 +124,11 @@ measureFileSizesBeforeBuild(paths.appBuild)
       process.exit(1);
     }
   );
-
+}
 // Create the production build and print the deployment instructions.
 function build(previousFileSizes) {
   console.log('Creating an optimized production build...');
-
+  
   let compiler = webpack(config);
   return new Promise((resolve, reject) => {
     compiler.run((err, stats) => {
@@ -180,3 +203,9 @@ function copyCesium() {
 
   console.log("Cesium copied to output folder");
 }
+
+if(require.main === module) {
+  makeBuild();
+}
+
+module.exports = makeBuild;

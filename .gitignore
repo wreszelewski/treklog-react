@@ -30,3 +30,4 @@ package.json
 functions/firebase-debug.log
 functions/tmpTrack.geojson
 curlCommands
+functions/views/index.mst
