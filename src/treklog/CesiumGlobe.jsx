@@ -32,6 +32,7 @@ import moment from "moment";
 import Camera from 'cesium/Source/Scene/Camera'
 import ScreenSpaceEventHandler from "cesium/Source/Core/ScreenSpaceEventHandler"
 import ScreenSpaceEventType from "cesium/Source/Core/ScreenSpaceEventType"
+import DistanceDisplayCondition from "cesium/Source/Core/DistanceDisplayCondition"
 import ReactQueryParams from 'react-query-params';
 
 class CesiumGlobe extends ReactQueryParams {
@@ -187,6 +188,7 @@ class CesiumGlobe extends ReactQueryParams {
                                 outlineColor : Color.BLACK,
                                 outlineWidth: 4,
                                 disableDepthTestDistance: Number.POSITIVE_INFINITY,
+                                distanceDisplayCondition: new DistanceDisplayCondition(0, 500000)
                             });
                             this.labels.add({
                                 position: new Cartesian3(placemark.x, placemark.y, placemark.z),
@@ -198,7 +200,8 @@ class CesiumGlobe extends ReactQueryParams {
                                 outlineWidth: 2,
                                 horizontalOrigin: HorizontalOrigin.CENTER,
                                 pixelOffset: new Cartesian2(0,-15),
-                                disableDepthTestDistance: Number.POSITIVE_INFINITY
+                                disableDepthTestDistance: Number.POSITIVE_INFINITY,
+                                distanceDisplayCondition: new DistanceDisplayCondition(0, 500000)
                             });
                         })
                     }
@@ -228,6 +231,12 @@ class CesiumGlobe extends ReactQueryParams {
             }
             if(this.state.animation.animationInitialized && !nextProps.animation.shouldBeInitialized) {
                 this.state.animation.stop();
+                for(let i = 0; this.labels.length; i++) {
+                    this.labels.get(i).distanceDisplayCondition.far = 500000;
+                }
+                for(let i = 0; this.points.length; i++) {
+                    this.points.get(i).distanceDisplayCondition.far = 500000;
+                }
                 if(this.state.admin) {
                     this.viewer.scene.screenSpaceCameraController.enableZoom = true;
                     this.scrollHandler.destroy();
@@ -235,6 +244,12 @@ class CesiumGlobe extends ReactQueryParams {
             }
             if(!this.viewer.clock.shouldAnimate && nextProps.animation.shouldPlay && nextProps.animation.shouldReplay) {
                 this.state.animation.play();
+                for(let i = 0; i < this.labels.length; i++) {
+                    this.labels.get(i).distanceDisplayCondition = new DistanceDisplayCondition(0, 5000);
+                }
+                for(let i = 0; i < this.points.length; i++) {
+                    this.points.get(i).distanceDisplayCondition = new DistanceDisplayCondition(0, 5000);
+                }
                 if(this.state.isAdmin) {
 
                     this.scrollHandler = new ScreenSpaceEventHandler(this.viewer.canvas);
