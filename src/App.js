@@ -14,8 +14,6 @@ import { connect } from 'react-redux'
 import {bindActionCreators} from 'redux';
 import { getTracks } from './treklog/helpers/trackLoader';
 import _ from 'lodash';
-import AddTrack from "./treklog/AddTrack";
-
 
 class App extends Component {
 
