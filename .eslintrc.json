@@ -51,6 +51,9 @@
         "camelcase": "warn",
         "comma-dangle": ["error", "never"],
         "comma-spacing": ["error", {"before": false, "after": true}],
-        "no-trailing-spaces": "error"
+        "no-trailing-spaces": "error",
+        "react/prop-types": "off",
+        "react/no-find-dom-node": "warn",
+        "react/no-string-refs": "warn"
     }
 }
