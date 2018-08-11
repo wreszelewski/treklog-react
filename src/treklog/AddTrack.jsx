@@ -7,14 +7,17 @@ import {Redirect} from "react-router";
 
 export default class AddTrack extends Component {
 
-    handleClose = this.props.actions.hideAddTrack;
-    showLoader = this.props.actions.showTreklogLoader;
-    hideLoader = this.props.actions.hideTreklogLoader;
-
-    state = {
-    	trackName: "",
-		trackDescription: "",
-		redirect: false
+	constructor() {
+		super();
+		this.handleClose = this.props.actions.hideAddTrack;
+		this.showLoader = this.props.actions.showTreklogLoader;
+		this.hideLoader = this.props.actions.hideTreklogLoader;
+	
+		this.state = {
+			trackName: "",
+			trackDescription: "",
+			redirect: false
+		}
 	}
 
     loadFile(ev) {

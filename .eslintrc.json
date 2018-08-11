@@ -1,0 +1,56 @@
+{
+    "env": {
+        "browser": true,
+        "es6": true
+    },
+    "extends": ["eslint:recommended", "plugin:react/recommended"],
+    "parserOptions": {
+        "ecmaFeatures": {
+            "jsx": true
+        },
+        "ecmaVersion": 6,
+        "sourceType": "module"
+    },
+    "plugins": [
+        "react"
+    ],
+    "rules": {
+        "no-const-assign": "warn",
+        "no-this-before-super": "warn",
+        "no-undef": "warn",
+        "no-unreachable": "warn",
+        "no-unused-vars": "warn",
+        "constructor-super": "warn",
+        "valid-typeof": "warn",
+        "indent": [
+            "error",
+            "tab"
+        ],
+        "linebreak-style": [
+            "error",
+            "unix"
+        ],
+        "quotes": [
+            "error",
+            "single"
+        ],
+        "semi": [
+            "error",
+            "always"
+        ],
+        "block-scoped-var": "warn",
+        "class-methods-use-this": "warn",
+        "complexity": ["warn", 10],
+        "no-extra-bind": "warn",
+        "no-lone-blocks": "warn",
+        "no-magic-numbers": ["error", {"ignoreArrayIndexes": true, "ignore": [0]}],
+        "no-multi-spaces": "error",
+        "no-redeclare": "warn",
+        "vars-on-top": "warn",
+        "array-bracket-spacing": ["warn", "never"],
+        "camelcase": "warn",
+        "comma-dangle": ["error", "never"],
+        "comma-spacing": ["error", {"before": false, "after": true}],
+        "no-trailing-spaces": "error"
+    }
+}
