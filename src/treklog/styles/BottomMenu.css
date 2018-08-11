@@ -19,6 +19,18 @@
     display: inline-block;
 }
 
+.bottomMenu .bottomMenuButtons .buttons .textInput {
+    background-color: transparent;
+    border: 2px solid #feefce;
+    border-radius: 4px;
+    color: #feefce;
+    padding: 6px 5px;
+    margin: 5px;
+    font-style: italic;
+    float: left;
+
+}
+
 .bottomMenu .bottomMenuButtons .ui.inverted.button {
     color: #FFEFCE;
     box-shadow: 0 0 0 2px #FFEFCE inset!important;    

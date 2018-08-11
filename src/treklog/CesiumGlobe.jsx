@@ -1,4 +1,4 @@
-import React, {Component} from "react";
+import React from "react";
 
 import Viewer from "cesium/Source/Widgets/Viewer/Viewer";
 import ProviderViewModel from "cesium/Source/Widgets/BaseLayerPicker/ProviderViewModel";
@@ -6,7 +6,14 @@ import ArcGisMapServerImageryProvider from "cesium/Source/Scene/ArcGisMapServerI
 import MapboxImageryProvider from "cesium/Source/Scene/MapboxImageryProvider";
 import CesiumTerrainProvider from "cesium/Source/Core/CesiumTerrainProvider";
 import Cartographic from "cesium/Source/Core/Cartographic";
+import LabelCollection from "cesium/Source/Scene/LabelCollection";
+import PointPrimitiveCollection from "cesium/Source/Scene/PointPrimitiveCollection";
+import PolylineCollection from "cesium/Source/Scene/PolylineCollection";
+import HorizontalOrigin from "cesium/Source/Scene/HorizontalOrigin";
+import Material from "cesium/Source/Scene/Material";
+import LabelStyle from "cesium/Source/Scene/LabelStyle";
 import Cartesian3 from "cesium/Source/Core/Cartesian3";
+import Cartesian2 from "cesium/Source/Core/Cartesian2";
 import Rectangle from "cesium/Source/Core/Rectangle";
 import HeadingPitchRange from "cesium/Source/Core/HeadingPitchRange";
 import Color from "cesium/Source/Core/Color";
@@ -20,19 +27,25 @@ import './styles/CesiumGlobe.css'
 import AnimationController from './helpers/AnimationController'
 import {bindActionCreators} from 'redux';  
 import * as treklogActions from "./state/actions";
-import JulianDate from "cesium/Source/Core/JulianDate"
+import JulianDate from "cesium/Source/Core/JulianDate";
+import NearFarScalar from "cesium/Source/Core/NearFarScalar";
 import config from "../config";
 import firebase from "firebase";
 import moment from "moment";
 import Camera from 'cesium/Source/Scene/Camera'
+import ScreenSpaceEventHandler from "cesium/Source/Core/ScreenSpaceEventHandler"
+import ScreenSpaceEventType from "cesium/Source/Core/ScreenSpaceEventType"
+import DistanceDisplayCondition from "cesium/Source/Core/DistanceDisplayCondition"
+import ReactQueryParams from 'react-query-params';
 
-class CesiumGlobe extends Component {
+class CesiumGlobe extends ReactQueryParams {
     state = {
         viewerLoaded : false,
         isPlaying: false,
         animationInitialized: false,
         animation: null,
-        animationSpeed: 300
+        animationSpeed: 300,
+        isAdmin: this.queryParams.adm
     }
 
     componentDidMount() {
@@ -47,7 +60,8 @@ class CesiumGlobe extends Component {
             
             Camera.DEFAULT_VIEW_FACTOR = 0;
             Camera.DEFAULT_VIEW_RECTANGLE = rectangle;
-
+            
+            this.scrollHandler = null;
             this.viewer = new Viewer(this.cesiumContainer, {
                 scene3DOnly: true,
                 selectionIndicator: false,
@@ -66,8 +80,10 @@ class CesiumGlobe extends Component {
                 fullscreenButton: false,
                 creditContainer: 'cesiumAttribution'
             });
-            this.setState({animation: new AnimationController(this.viewer, this.props.actions)});
+            this.setState({animation: new AnimationController(this.viewer, this.props.actions, this.state)});
             this.viewer.scene.globe.baseColor = new Color.fromCssColorString('#ce841c'); 
+            this.polylines = this.viewer.scene.primitives.add(new PolylineCollection());
+            this.labels = this.viewer.scene.primitives.add(new LabelCollection());
             this.viewer.terrainProvider = new CesiumTerrainProvider({
                 url: 'https://assets.agi.com/stk-terrain/world',
                 requestWaterMask: false,
@@ -86,8 +102,6 @@ class CesiumGlobe extends Component {
             const currentLiveData = snapshot.val();
             if(currentLiveData.trackUrl === track.url) {
                 if(this.viewer.dataSources.get(1)) {
-                    const time = new JulianDate.fromIso8601(currentLiveData.lastUpdate);
-                    const position = Cartesian3.fromDegrees(currentLiveData.point.longitude, currentLiveData.point.latitude, currentLiveData.point.elevation);
                     const availability = JulianDate.toIso8601(this.viewer.clock.startTime) + '/' + moment(currentLiveData.lastUpdate).toISOString();
                     const pathCarto = [new Cartographic.fromDegrees(currentLiveData.point.latitude, currentLiveData.point.longitude)];
                     sampleTerrainMostDetailed(this.viewer.terrainProvider, pathCarto)
@@ -137,6 +151,13 @@ class CesiumGlobe extends Component {
             return Promise.all([geoJsonDs, czmlDs]);
         }).then(([geoJsonDs, czmlDs]) => {
             this.viewer.dataSources.removeAll();
+            if(this.labels) {
+                this.labels.removeAll();
+            }
+            if(this.polylines) {
+                
+                this.polylines.removeAll();
+            }
             const addGeoJson = this.viewer.dataSources.add(geoJsonDs);
             const addCzml = this.viewer.dataSources.add(czmlDs);
             return Promise.all([addGeoJson, addCzml]);
@@ -147,11 +168,54 @@ class CesiumGlobe extends Component {
                  const destination = cameraPosition.getDestination(track);
                  const orientation = cameraPosition.getOrientation(track);
                 
-                 return this.viewer.camera.flyTo({
-                    destination,
-                    //orientation,
+                 return this.viewer.flyTo(addGeoJson, {
                     maxiumumHeight: 20000,
-                    duration: 3
+                    duration: 3,
+                    offset: new HeadingPitchRange(0, -1.5707963267948966, 20000)
+                }).then(() => {
+                    return this.viewer.camera.flyTo({
+                        destination,
+                        orientation,
+                        maxiumumHeight: 20000,
+                        duration: 3
+                    })
+                }).then(() => {
+                    if(track.placemarks && track.placemarks.length > 0) {
+
+                        track.placemarks.forEach(placemark => {
+    
+                            this.polylines.add({
+                                positions: Cartesian3.fromDegreesArrayHeights([
+                                  placemark.longitude, placemark.latitude, placemark.height,
+                                  placemark.longitude, placemark.latitude, placemark.height + 300  
+                                ]),
+                                width: 1,
+                                material: new Material({
+                                    fabric : {
+                                        type : 'Color',
+                                        uniforms : {
+                                            color : Color.fromCssColorString('#f4d797')
+                                        }
+                                    }
+                                }),
+                                distanceDisplayCondition: new DistanceDisplayCondition(0, 20000)
+                            });
+                            this.labels.add({
+                                position: Cartesian3.fromDegrees(placemark.longitude, placemark.latitude, placemark.height + 350),
+                                text: placemark.name,
+                                font: '20px Lato, sans-serif',
+                                style: LabelStyle.FILL_AND_OUTLINE,
+                                fillColor : Color.fromCssColorString('#f4d797'),
+                                outlineColor : Color.fromCssColorString('#2d200e'),
+                                outlineWidth: 2,
+                                horizontalOrigin: HorizontalOrigin.CENTER,
+                                distanceDisplayCondition: new DistanceDisplayCondition(0, 30000)
+                            });
+                        })
+                    }
+
+    
+                    
                 });
             } else {
                 return this.viewer.flyTo(addGeoJson, {offset: new HeadingPitchRange(0, -1.57, 4000)});
@@ -175,9 +239,25 @@ class CesiumGlobe extends Component {
             }
             if(this.state.animation.animationInitialized && !nextProps.animation.shouldBeInitialized) {
                 this.state.animation.stop();
+                for(let i = 0; i < this.labels.length; i++) {
+                    this.labels.get(i).distanceDisplayCondition = new DistanceDisplayCondition(0, 30000);
+                }
+                for(let i = 0; i < this.polylines.length; i++) {
+                    this.polylines.get(i).distanceDisplayCondition = new DistanceDisplayCondition(0, 30000);
+                }
+                if(this.state.admin) {
+                    this.viewer.scene.screenSpaceCameraController.enableZoom = true;
+                    this.scrollHandler.destroy();
+                }
             }
             if(!this.viewer.clock.shouldAnimate && nextProps.animation.shouldPlay && nextProps.animation.shouldReplay) {
                 this.state.animation.play();
+                for(let i = 0; i < this.labels.length; i++) {
+                    this.labels.get(i).distanceDisplayCondition = new DistanceDisplayCondition(1900, 5000);
+                }
+                for(let i = 0; i < this.polylines.length; i++) {
+                    this.polylines.get(i).distanceDisplayCondition = new DistanceDisplayCondition(2000, 5000);
+                }
             }
             if(this.viewer.clock.shouldAnimate && !nextProps.animation.shouldPlay) {
                 this.state.animation.pause();
