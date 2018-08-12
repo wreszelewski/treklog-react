@@ -28,7 +28,7 @@ export default class BottomMenu extends Component {
 						<AnimationMenuContainer />
 						<TrackDescriptionContainer />
 						<div className="bottomMenuButtons">
-							<BottomMenuButtons track = {this.props.track} cesiumViewer={this.props.cesiumViewer}/>
+							<BottomMenuButtons track = {this.props.track} cesiumViewer={this.props.cesiumViewer} placemarks={this.props.placemarks} actions={this.props.treklogGlobeActions}/>
 							<Button inverted size="small" style={{marginRight: '10px', marginLeft: '10px', marginTop: '5px'}} onClick={this.toggleDescription.bind(this)}>Zwiń opis</Button>
 						</div>
 					</div>
@@ -39,7 +39,7 @@ export default class BottomMenu extends Component {
 					<div className="bottomMenu">
 						<AnimationMenuContainer />
 						<div className="bottomMenuButtons">
-							<BottomMenuButtons track={this.props.track} cesiumViewer={this.props.cesiumViewer}/>
+							<BottomMenuButtons track = {this.props.track} cesiumViewer={this.props.cesiumViewer} placemarks={this.props.placemarks} actions={this.props.treklogGlobeActions}/>
 							<Button inverted size="small" style={{marginRight: '10px', marginLeft: '10px', marginTop: '5px'}} onClick={this.toggleDescription.bind(this)}>Pokaż opis</Button>
 						</div>
 					</div>

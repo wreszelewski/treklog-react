@@ -13,10 +13,6 @@ import CesiumTerrainProvider from 'cesium/Source/Core/CesiumTerrainProvider';
 import Cartographic from 'cesium/Source/Core/Cartographic';
 import LabelCollection from 'cesium/Source/Scene/LabelCollection';
 import PolylineCollection from 'cesium/Source/Scene/PolylineCollection';
-import HorizontalOrigin from 'cesium/Source/Scene/HorizontalOrigin';
-import Material from 'cesium/Source/Scene/Material';
-import LabelStyle from 'cesium/Source/Scene/LabelStyle';
-import Cartesian3 from 'cesium/Source/Core/Cartesian3';
 import Rectangle from 'cesium/Source/Core/Rectangle';
 import HeadingPitchRange from 'cesium/Source/Core/HeadingPitchRange';
 import Color from 'cesium/Source/Core/Color';
@@ -25,7 +21,6 @@ import GeoJsonDataSource from 'cesium/Source/DataSources/GeoJsonDataSource';
 import CzmlDataSource from 'cesium/Source/DataSources/CzmlDataSource';
 import JulianDate from 'cesium/Source/Core/JulianDate';
 import Camera from 'cesium/Source/Scene/Camera';
-import DistanceDisplayCondition from 'cesium/Source/Core/DistanceDisplayCondition';
 
 import czml from 'treklog/helpers/czml';
 import cameraPosition from 'treklog/helpers/cameraPosition';
@@ -39,12 +34,6 @@ import 'treklog/styles/CesiumGlobe.css';
 
 const heading = 0;
 const pitch = -1.5707963267948966;
-const lineVisibleTo = 20000;
-const labelVisibleTo = 30000;
-const playVisibleTo = 5000;
-const playVisibleFrom = 2000;
-const labelHeight = 100;
-const visibleFrom = 0;
 
 class TreklogGlobe extends ReactQueryParams {
 

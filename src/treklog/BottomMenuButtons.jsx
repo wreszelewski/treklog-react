@@ -7,12 +7,6 @@ import Cartesian3 from 'cesium/Source/Core/Cartesian3';
 import Color from 'cesium/Source/Core/Color';
 import ScreenSpaceEventHandler from 'cesium/Source/Core/ScreenSpaceEventHandler';
 import ScreenSpaceEventType from 'cesium/Source/Core/ScreenSpaceEventType';
-import LabelCollection from 'cesium/Source/Scene/LabelCollection';
-import PolylineCollection from 'cesium/Source/Scene/PolylineCollection';
-import DistanceDisplayCondition from 'cesium/Source/Core/DistanceDisplayCondition';
-import HorizontalOrigin from 'cesium/Source/Scene/HorizontalOrigin';
-import Material from 'cesium/Source/Scene/Material';
-import LabelStyle from 'cesium/Source/Scene/LabelStyle';
 
 import TrackCalculator from './helpers/trackCalculator';
 
@@ -32,8 +26,6 @@ export default class BottomMenuButtons extends Component {
 			pointHeight: 0
 		};
 
-		this.polylines = this.props.cesiumViewer.scene.primitives.add(new PolylineCollection());
-		this.labels = this.props.cesiumViewer.scene.primitives.add(new LabelCollection());
 		this.points = this.props.cesiumViewer.scene.primitives.add(new PointPrimitiveCollection());
 		this.pointIndex = 0;
 		firebase.auth().onAuthStateChanged(user => {
@@ -245,41 +237,8 @@ export default class BottomMenuButtons extends Component {
 
 	addPoint() {
 
-		const polylineLength = 300;
-		const labelVerticalOffset = 350;
-		const visibleFrom = 0;
-		const lineVisibleTo = 20000;
-		const labelVisibleTo = 30000;
+		let placemarks = this.props.placemarks.slice();
 
-		let placemarks = this.props.track.placemarks || [];
-
-		this.polylines.add({
-			positions: Cartesian3.fromDegreesArrayHeights([
-				this.state.pointLatitude, this.state.pointLongitude, this.state.pointHeight,
-				this.state.pointLatitude, this.state.pointLongitude, this.state.pointHeight + polylineLength
-			]),
-			width: 1,
-			material: new Material({
-				fabric : {
-					type : 'Color',
-					uniforms : {
-						color : Color.fromCssColorString('#f4d797')
-					}
-				}
-			}),
-			distanceDisplayCondition: new DistanceDisplayCondition(visibleFrom, lineVisibleTo)
-		});
-		this.labels.add({
-			position: Cartesian3.fromDegrees(this.state.pointLatitude, this.state.pointLongitude, this.state.pointHeight + labelVerticalOffset),
-			text: this.state.pointName,
-			font: '20px Lato, sans-serif',
-			style: LabelStyle.FILL_AND_OUTLINE,
-			fillColor : Color.fromCssColorString('#f4d797'),
-			outlineColor : Color.fromCssColorString('#2d200e'),
-			outlineWidth: 2,
-			horizontalOrigin: HorizontalOrigin.CENTER,
-			distanceDisplayCondition: new DistanceDisplayCondition(visibleFrom, labelVisibleTo)
-		});
 		placemarks.push({
 			longitude: this.state.pointLatitude,
 			latitude: this.state.pointLongitude,
@@ -287,6 +246,7 @@ export default class BottomMenuButtons extends Component {
 			name: this.state.pointName
 		});
 		const updates = {placemarks: placemarks};
+		this.props.actions.updatePlacemarks(placemarks);
 		this.setState({pointName: 'Nowy punkt'});
 		return firebase.database().ref('tracks' + this.props.track.url).update(updates);
 	}
