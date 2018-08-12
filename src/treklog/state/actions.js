@@ -24,15 +24,15 @@ export const ANIMATION_PROGRESS_SET_TIME = 'ANIMATION_PROGRESS_SET_TIME';
 export const CESIUM_VIEWER_CREATED = 'CESIUM_VIEWER_CREATED';
 
 export function fetchTrackStarted() {
-  return { type: FETCH_TRACK_STARTED }
+	return { type: FETCH_TRACK_STARTED };
 }
 
 export function fetchTrackFinished(track) {
-    return { type: FETCH_TRACK_FINISHED, track}
+	return { type: FETCH_TRACK_FINISHED, track};
 }
 
 export function fetchTracksFinished(tracks) {
-  return { type: FETCH_TRACKS_FINISHED, tracks}
+	return { type: FETCH_TRACKS_FINISHED, tracks};
 }
 
 export function showAddTrack() {
@@ -44,49 +44,49 @@ export function hideAddTrack() {
 }
 
 export function showTrackMenu() {
-  return { type: SHOW_TRACK_MENU };
+	return { type: SHOW_TRACK_MENU };
 }
 
 export function hideTrackMenu() {
-  return { type: HIDE_TRACK_MENU};
+	return { type: HIDE_TRACK_MENU};
 }
 
 export function showTreklogLoader() {
-  return { type: SHOW_TREKLOG_LOADER };
+	return { type: SHOW_TREKLOG_LOADER };
 }
 
 export function hideTreklogLoader() {
-  return { type: HIDE_TREKLOG_LOADER };
+	return { type: HIDE_TREKLOG_LOADER };
 }
 
 export function animationPlay() {
-  return { type: ANIMATION_PLAY };
+	return { type: ANIMATION_PLAY };
 }
 
 export function animationPause() {
-  return { type: ANIMATION_PAUSE };
+	return { type: ANIMATION_PAUSE };
 }
 
 export function animationStop() {
-  return { type: ANIMATION_STOP };
+	return { type: ANIMATION_STOP };
 }
 
 export function animationReset() {
-  return { type: ANIMATION_RESET };
+	return { type: ANIMATION_RESET };
 }
 
 export function animationSetSpeed(speed) {
-  return { type: ANIMATION_SET_SPEED, speed };
+	return { type: ANIMATION_SET_SPEED, speed };
 }
 
 export function updateAnimationProgress(currentRelativeTime, currentTime) {
-  return { type: UPDATE_ANIMATION_PROGRESS, currentRelativeTime, currentTime};
+	return { type: UPDATE_ANIMATION_PROGRESS, currentRelativeTime, currentTime};
 }
 
 export function animationProgressSetTime(newTime) {
-  return { type: ANIMATION_PROGRESS_SET_TIME, newTime};
+	return { type: ANIMATION_PROGRESS_SET_TIME, newTime};
 }
 
 export function cesiumViewerCreated(cesiumViewer) {
-  return { type: CESIUM_VIEWER_CREATED, cesiumViewer};
+	return { type: CESIUM_VIEWER_CREATED, cesiumViewer};
 }

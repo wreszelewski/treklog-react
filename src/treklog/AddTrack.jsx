@@ -8,8 +8,8 @@ import './styles/TrackMenu.css';
 
 export default class AddTrack extends Component {
 
-	constructor() {
-		super();
+	constructor(props) {
+		super(props);
 		this.handleClose = this.props.actions.hideAddTrack;
 		this.showLoader = this.props.actions.showTreklogLoader;
 		this.hideLoader = this.props.actions.hideTreklogLoader;

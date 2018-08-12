@@ -106,18 +106,21 @@ export default class BottomMenuButtons extends Component {
 		'<style><![CDATA[' +
 		'tspan{font-size:8px;fill:white;font-family:sans-serif;}' +
 		']]></style>' +
-				   '<text x="0" y="0">' +
-				   svgRowsArr.join('') +
-				   '</text>' +
-				   '</svg>';
+		'<text x="0" y="0">' +
+		svgRowsArr.join('') +
+		'</text>' +
+		'</svg>';
 		var img = new Image();
 		var img2 = new Image();
 		var svg = 'data:image/svg+xml,' + data;
 
 		img.onload = () => {
-			ctx.drawImage(img, 0, 0, 900, 472);
+			const width = 900;
+			const height = 472;
+			const creditRowHeight = 10;
+			ctx.drawImage(img, 0, 0, width, height);
 			img2.onload = () => {
-				ctx.drawImage(img2, 0, canvas.height-(creditsRows.length * 10));
+				ctx.drawImage(img2, 0, canvas.height-(creditsRows.length * creditRowHeight));
 				//DOMURL.revokeObjectURL(url);
 				return this._storeSocialImageAndMeta(socialFilePath, canvas.toDataURL());
 			};
@@ -129,6 +132,7 @@ export default class BottomMenuButtons extends Component {
 	}
 
 	_splitCredits(credits) {
+		const additionalSpace = 1;
 		const splittedCredits = credits.split(' ');
 		const limit = 250;
 		let letters = 0;
@@ -137,7 +141,7 @@ export default class BottomMenuButtons extends Component {
 		splittedCredits.forEach(function(word) {
 			if(letters + word.length < limit) {
 				row.push(word);
-				letters += word.length + 1;
+				letters += word.length + additionalSpace;
 			} else {
 				rows.push(row);
 				row = [word];
@@ -146,14 +150,14 @@ export default class BottomMenuButtons extends Component {
 		});
 		rows.push(row);
 		const strRows = rows.map(row => row.join(' '));
-		return strRows
-	} 
+		return strRows;
+	}
 
 	_storeSocialImageAndMeta(path, data) {
 		const imgPath = '/socialImages' + path + '.jpg';
 		const metadata = {
-			contentType: 'image/jpeg',
-		};      
+			contentType: 'image/jpeg'
+		};
 		firebase.storage().ref().child(imgPath).putString(data, 'data_url', metadata).then((image) => {
 			let updates = {};
 			updates['socialImage'] = image.downloadURL;
@@ -163,18 +167,18 @@ export default class BottomMenuButtons extends Component {
 
 	finishLive() {
 		const trackCalc = new TrackCalculator(this.props.track.originalGeoJsonPoints, this.props.track.czmlAltitude);
-		const altitudeStats = trackCalc.altitudeStats
-		let updates = {}
+		const altitudeStats = trackCalc.altitudeStats;
+		let updates = {};
 		updates['isLive'] = false;
 		updates['geoJsonPoints'] = {};
 		updates['originalGeoJsonPoints'] = {};
-		updates['originalGeoJsonPath'] = trackCalc.originalGeoJsonPath
-		updates['geoJsonPath'] = trackCalc.geoJsonPath
+		updates['originalGeoJsonPath'] = trackCalc.originalGeoJsonPath;
+		updates['geoJsonPath'] = trackCalc.geoJsonPath;
 
 		return firebase.storage().ref(this.props.track.geoJsonPath).getDownloadURL()
 			.then(path => {
 				const geoJsonReq = new Request(path);
-				return fetch(geoJsonReq)
+				return fetch(geoJsonReq);
 			}).then(geojsonFile => geojsonFile.blob())
 			.then(geojsonFile => {
 				return Promise.all([
@@ -201,50 +205,58 @@ export default class BottomMenuButtons extends Component {
 			pointHeight: pointPosition[2]
 		});
 		this.currentPoint = this.points.add({
-			 position: Cartesian3.fromDegrees(pointPosition[0], pointPosition[1], pointPosition[2]),
-			 pixelSize: 20.0,
-			 color: Color.BLACK,
-			 disableDepthTestDistance: Number.POSITIVE_INFINITY,
+			position: Cartesian3.fromDegrees(pointPosition[0], pointPosition[1], pointPosition[2]),
+			pixelSize: 20.0,
+			color: Color.BLACK,
+			disableDepthTestDistance: Number.POSITIVE_INFINITY
 		});
 
 		this.scrollHandler = new ScreenSpaceEventHandler(this.props.cesiumViewer.canvas);
 		this.props.cesiumViewer.scene.screenSpaceCameraController.enableZoom = false;
-						this.scrollHandler.setInputAction((e) => {
-							if(e > 0) {
-								if(this.pointIndex < this.props.track.geoJsonPoints.features[0].geometry.coordinates.length - 1) {
-									this.pointIndex += 1;
-								}
+		this.scrollHandler.setInputAction((e) => {
+			if(e > 0) {
+				const padding = 1;
+				if(this.pointIndex < this.props.track.geoJsonPoints.features[0].geometry.coordinates.length - padding) {
+					this.pointIndex += 1;
+				}
 
-							} else {
-								if(this.pointIndex > 0) {
-									this.pointIndex -= 1;
-								}
-							}
-							const pointPosition = this.props.track.geoJsonPoints.features[0].geometry.coordinates[this.pointIndex];
-							this.currentPoint.position = Cartesian3.fromDegrees(pointPosition[0], pointPosition[1], pointPosition[2]);
-							this.setState({
-								pointLatitude: pointPosition[0],
-								pointLongitude: pointPosition[1],
-								pointHeight: pointPosition[2]
-							})
-						}, ScreenSpaceEventType.WHEEL);
-		
+			} else {
+				if(this.pointIndex > 0) {
+					this.pointIndex -= 1;
+				}
+			}
+			const pointPosition = this.props.track.geoJsonPoints.features[0].geometry.coordinates[this.pointIndex];
+			this.currentPoint.position = Cartesian3.fromDegrees(pointPosition[0], pointPosition[1], pointPosition[2]);
+			this.setState({
+				pointLatitude: pointPosition[0],
+				pointLongitude: pointPosition[1],
+				pointHeight: pointPosition[2]
+			});
+		}, ScreenSpaceEventType.WHEEL);
+
 	}
 
 	leaveAddPointMode() {
 		this.setState({addPointMode: false});
 		this.points.removeAll();
 		this.props.cesiumViewer.scene.screenSpaceCameraController.enableZoom = true;
-		
+
 	}
 
 	addPoint() {
+
+		const polylineLength = 300;
+		const labelVerticalOffset = 350;
+		const visibleFrom = 0;
+		const lineVisibleTo = 20000;
+		const labelVisibleTo = 30000;
+
 		let placemarks = this.props.track.placemarks || [];
 
 		this.polylines.add({
 			positions: Cartesian3.fromDegreesArrayHeights([
-			  this.state.pointLatitude, this.state.pointLongitude, this.state.pointHeight,
-			  this.state.pointLatitude, this.state.pointLongitude, this.state.pointHeight + 300  
+				this.state.pointLatitude, this.state.pointLongitude, this.state.pointHeight,
+				this.state.pointLatitude, this.state.pointLongitude, this.state.pointHeight + polylineLength
 			]),
 			width: 1,
 			material: new Material({
@@ -255,10 +267,10 @@ export default class BottomMenuButtons extends Component {
 					}
 				}
 			}),
-			distanceDisplayCondition: new DistanceDisplayCondition(0, 20000)
+			distanceDisplayCondition: new DistanceDisplayCondition(visibleFrom, lineVisibleTo)
 		});
 		this.labels.add({
-			position: Cartesian3.fromDegrees(this.state.pointLatitude, this.state.pointLongitude, this.state.pointHeight + 350),
+			position: Cartesian3.fromDegrees(this.state.pointLatitude, this.state.pointLongitude, this.state.pointHeight + labelVerticalOffset),
 			text: this.state.pointName,
 			font: '20px Lato, sans-serif',
 			style: LabelStyle.FILL_AND_OUTLINE,
@@ -266,7 +278,7 @@ export default class BottomMenuButtons extends Component {
 			outlineColor : Color.fromCssColorString('#2d200e'),
 			outlineWidth: 2,
 			horizontalOrigin: HorizontalOrigin.CENTER,
-			distanceDisplayCondition: new DistanceDisplayCondition(0, 30000)
+			distanceDisplayCondition: new DistanceDisplayCondition(visibleFrom, labelVisibleTo)
 		});
 		placemarks.push({
 			longitude: this.state.pointLatitude,
@@ -274,25 +286,25 @@ export default class BottomMenuButtons extends Component {
 			height: this.state.pointHeight,
 			name: this.state.pointName
 		});
-		const updates = {placemarks: placemarks}
-		this.setState({pointName: "Nowy punkt"});
+		const updates = {placemarks: placemarks};
+		this.setState({pointName: 'Nowy punkt'});
 		return firebase.database().ref('tracks' + this.props.track.url).update(updates);
 	}
 
 	updatePointName(ev) {
 		this.setState({pointName: ev.target.value});
 	}
-	
+
 	updatePointLongitude(ev) {
 		this.setState({pointLongitude: parseFloat(ev.target.value)});
 		this.currentPoint.position = Cartesian3.fromDegrees(parseFloat(this.state.pointLatitude), parseFloat(this.state.pointLongitude), parseFloat(this.state.pointHeight));
 	}
-	
+
 	updatePointLatitude(ev) {
 		this.setState({pointLatitude: parseFloat(ev.target.value)});
 		this.currentPoint.position = Cartesian3.fromDegrees(parseFloat(this.state.pointLatitude), parseFloat(this.state.pointLongitude), parseFloat(this.state.pointHeight));
 	}
-	
+
 	updatePointHeight(ev) {
 		this.setState({pointHeight: parseFloat(ev.target.value)});
 		this.currentPoint.position = Cartesian3.fromDegrees(parseFloat(this.state.pointLatitude), parseFloat(this.state.pointLongitude), parseFloat(this.state.pointHeight));
@@ -300,30 +312,30 @@ export default class BottomMenuButtons extends Component {
 
 	render() {
 		if(this.state.isLoggedIn) {
-				if(this.state.addPointMode) {
-					return (    
-						<div className="buttons">
+			if(this.state.addPointMode) {
+				return (
+					<div className="buttons">
 						<input type="text" className="textInput" value={this.state.pointLongitude} onChange={this.updatePointLongitude.bind(this)}/>
 						<input type="text" className="textInput" value={this.state.pointLatitude} onChange={this.updatePointLatitude.bind(this)}/>
 						<input type="text" className="textInput" value={this.state.pointHeight} onChange={this.updatePointHeight.bind(this)}/>
 						<input type="text" className="textInput" id="pointName" value={this.state.pointName} onChange={this.updatePointName.bind(this)}/>
-						<Button inverted size="small" style={{marginRight: "10px", marginLeft: "10px", marginTop: "5px"}} onClick={this.addPoint.bind(this)}>Dodaj punkt</Button>    
-						<Button inverted size="small" style={{marginRight: "10px", marginLeft: "10px", marginTop: "5px"}} onClick={this.leaveAddPointMode.bind(this)}>Opuść dodawanie punktu</Button>
-						</div>
-					)
-				} else {
-					return (    
-						<div className="buttons">
-						<Button inverted size="small" style={{marginRight: "10px", marginLeft: "10px", marginTop: "5px"}} onClick={this.setAddPointMode.bind(this)}>Dodawanie punktu</Button>    
-						<Button inverted size="small" style={{marginRight: "10px", marginLeft: "10px", marginTop: "5px"}} onClick={this.setSocialImage.bind(this)}>Ustaw obrazek</Button>
-						<Button inverted size="small" style={{marginRight: "10px", marginLeft: "10px", marginTop: "5px"}} onClick={this.setInitialPosition.bind(this)}>Ustaw pozycję</Button>
-						<Button inverted size="small" style={{marginRight: "10px", marginLeft: "10px", marginTop: "5px"}} onClick={this.recalculateTrack.bind(this)}>Przelicz trasę</Button>
-						<Button inverted size="small" style={{marginRight: "10px", marginLeft: "10px", marginTop: "5px"}} onClick={this.finishLive.bind(this)}>Zakończ live</Button>
-						</div>
-					)
-				}
+						<Button inverted size="small" style={{marginRight: '10px', marginLeft: '10px', marginTop: '5px'}} onClick={this.addPoint.bind(this)}>Dodaj punkt</Button>
+						<Button inverted size="small" style={{marginRight: '10px', marginLeft: '10px', marginTop: '5px'}} onClick={this.leaveAddPointMode.bind(this)}>Opuść dodawanie punktu</Button>
+					</div>
+				);
 			} else {
-				return null
+				return (
+					<div className="buttons">
+						<Button inverted size="small" style={{marginRight: '10px', marginLeft: '10px', marginTop: '5px'}} onClick={this.setAddPointMode.bind(this)}>Dodawanie punktu</Button>
+						<Button inverted size="small" style={{marginRight: '10px', marginLeft: '10px', marginTop: '5px'}} onClick={this.setSocialImage.bind(this)}>Ustaw obrazek</Button>
+						<Button inverted size="small" style={{marginRight: '10px', marginLeft: '10px', marginTop: '5px'}} onClick={this.setInitialPosition.bind(this)}>Ustaw pozycję</Button>
+						<Button inverted size="small" style={{marginRight: '10px', marginLeft: '10px', marginTop: '5px'}} onClick={this.recalculateTrack.bind(this)}>Przelicz trasę</Button>
+						<Button inverted size="small" style={{marginRight: '10px', marginLeft: '10px', marginTop: '5px'}} onClick={this.finishLive.bind(this)}>Zakończ live</Button>
+					</div>
+				);
 			}
-  }
+		} else {
+			return null;
+		}
+	}
 }
