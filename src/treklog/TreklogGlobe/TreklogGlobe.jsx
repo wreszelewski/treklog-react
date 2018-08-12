@@ -27,13 +27,15 @@ import JulianDate from 'cesium/Source/Core/JulianDate';
 import Camera from 'cesium/Source/Scene/Camera';
 import DistanceDisplayCondition from 'cesium/Source/Core/DistanceDisplayCondition';
 
-import czml from './helpers/czml';
-import cameraPosition from './helpers/cameraPosition';
-import AnimationController from './helpers/AnimationController';
-import * as treklogActions from './state/actions';
-import config from '../config';
+import czml from 'treklog/helpers/czml';
+import cameraPosition from 'treklog/helpers/cameraPosition';
+import AnimationController from 'treklog/helpers/AnimationController';
+import * as treklogActions from 'treklog/state/actions';
+import config from 'config';
 
-import './styles/CesiumGlobe.css';
+import * as actions from './actions';
+
+import 'treklog/styles/CesiumGlobe.css';
 
 const heading = 0;
 const pitch = -1.5707963267948966;
@@ -44,10 +46,10 @@ const playVisibleFrom = 2000;
 const labelHeight = 100;
 const visibleFrom = 0;
 
-class CesiumGlobe extends ReactQueryParams {
+class TreklogGlobe extends ReactQueryParams {
 
-	constructor() {
-		super();
+	constructor(props) {
+		super(props);
 		this.state = {
 			viewerLoaded: false,
 			isPlaying: false,
@@ -165,13 +167,6 @@ class CesiumGlobe extends ReactQueryParams {
 			return Promise.all([geoJsonDs, czmlDs]);
 		}).then(([geoJsonDs, czmlDs]) => {
 			this.viewer.dataSources.removeAll();
-			if (this.labels) {
-				this.labels.removeAll();
-			}
-			if (this.polylines) {
-
-				this.polylines.removeAll();
-			}
 			const addGeoJson = this.viewer.dataSources.add(geoJsonDs);
 			const addCzml = this.viewer.dataSources.add(czmlDs);
 			return Promise.all([addGeoJson, addCzml]);
@@ -196,44 +191,7 @@ class CesiumGlobe extends ReactQueryParams {
 						duration: 3
 					});
 				}).then(() => {
-
-					const placemarkLineExaggeration = 300;
-					const placemarkLabelExaggeration = 350;
-					if (track.placemarks && track.placemarks.length > 0) {
-						track.placemarks.forEach(placemark => {
-
-							this.polylines.add({
-								positions: Cartesian3.fromDegreesArrayHeights([
-									placemark.longitude, placemark.latitude, placemark.height,
-									placemark.longitude, placemark.latitude, placemark.height + placemarkLineExaggeration
-								]),
-								width: 1,
-								material: new Material({
-									fabric: {
-										type: 'Color',
-										uniforms: {
-											color: Color.fromCssColorString('#f4d797')
-										}
-									}
-								}),
-								distanceDisplayCondition: new DistanceDisplayCondition(visibleFrom, lineVisibleTo)
-							});
-							this.labels.add({
-								position: Cartesian3.fromDegrees(placemark.longitude, placemark.latitude, placemark.height + placemarkLabelExaggeration),
-								text: placemark.name,
-								font: '20px Lato, sans-serif',
-								style: LabelStyle.FILL_AND_OUTLINE,
-								fillColor: Color.fromCssColorString('#f4d797'),
-								outlineColor: Color.fromCssColorString('#2d200e'),
-								outlineWidth: 2,
-								horizontalOrigin: HorizontalOrigin.CENTER,
-								distanceDisplayCondition: new DistanceDisplayCondition(visibleFrom, labelVisibleTo)
-							});
-						});
-					}
-
-
-
+					this.props.treklogGlobeActions.updatePlacemarks(track.placemarks);
 				});
 			} else {
 				const range = 4000;
@@ -249,7 +207,7 @@ class CesiumGlobe extends ReactQueryParams {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		if (this.props.track !== nextProps.track) {
+		if (this.props.track && this.props.track.url !== nextProps.track.url) {
 			this.loadTrack(nextProps.track);
 		}
 
@@ -259,25 +217,9 @@ class CesiumGlobe extends ReactQueryParams {
 			}
 			if (this.state.animation.animationInitialized && !nextProps.animation.shouldBeInitialized) {
 				this.state.animation.stop();
-				for (let i = 0; i < this.labels.length; i++) {
-					this.labels.get(i).distanceDisplayCondition = new DistanceDisplayCondition(visibleFrom, labelVisibleTo);
-				}
-				for (let i = 0; i < this.polylines.length; i++) {
-					this.polylines.get(i).distanceDisplayCondition = new DistanceDisplayCondition(visibleFrom, lineVisibleTo);
-				}
-				if (this.state.admin) {
-					this.viewer.scene.screenSpaceCameraController.enableZoom = true;
-					this.scrollHandler.destroy();
-				}
 			}
 			if (!this.viewer.clock.shouldAnimate && nextProps.animation.shouldPlay && nextProps.animation.shouldReplay) {
 				this.state.animation.play();
-				for (let i = 0; i < this.labels.length; i++) {
-					this.labels.get(i).distanceDisplayCondition = new DistanceDisplayCondition(playVisibleFrom - labelHeight, playVisibleTo);
-				}
-				for (let i = 0; i < this.polylines.length; i++) {
-					this.polylines.get(i).distanceDisplayCondition = new DistanceDisplayCondition(playVisibleFrom, playVisibleTo);
-				}
 			}
 			if (this.viewer.clock.shouldAnimate && !nextProps.animation.shouldPlay) {
 				this.state.animation.pause();
@@ -318,14 +260,19 @@ class CesiumGlobe extends ReactQueryParams {
 		const widgetStyle = {
 			flexGrow: 2
 		};
-
+		const children = React.Children.map(this.props.children, child => {
+			return React.cloneElement(child, {cesiumViewer: this.viewer});
+		});
 		return (
-			<div className="cesiumGlobeWrapper" style={containerStyle}>
-				<div
-					className="cesiumWidget"
-					ref={element => this.cesiumContainer = element}
-					style={widgetStyle}
-				/>
+			<div>
+				<div className="cesiumGlobeWrapper" style={containerStyle}>
+					<div
+						className="cesiumWidget"
+						ref={element => this.cesiumContainer = element}
+						style={widgetStyle}
+					/>
+					{children}
+				</div>
 			</div>
 		);
 	}
@@ -388,7 +335,10 @@ const mapStateToProps = (state) => {
 };
 
 function mapDispatchToProps(dispatch) {
-	return { actions: bindActionCreators(treklogActions, dispatch) };
+	return {
+		actions: bindActionCreators(treklogActions, dispatch),
+		treklogGlobeActions: bindActionCreators(actions, dispatch)
+	};
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(CesiumGlobe);
+export default connect(mapStateToProps, mapDispatchToProps)(TreklogGlobe);

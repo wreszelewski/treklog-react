@@ -1,12 +1,14 @@
-const firebase = require('firebase');
+import firebase from 'firebase';
 
 const config = {
-	apiKey: 'AIzaSyBkFAImgTGsUkPChnOpO788GvS6-OeOe9M',
-	authDomain: 'treklog-d28c2.firebaseapp.com',
-	databaseURL: 'https://treklog-d28c2.firebaseio.com',
-	projectId: 'treklog-d28c2',
-	storageBucket: 'treklog-d28c2.appspot.com',
-	messagingSenderId: '834453176935',
+	firebase: {
+		apiKey: 'AIzaSyBkFAImgTGsUkPChnOpO788GvS6-OeOe9M',
+		authDomain: 'treklog-d28c2.firebaseapp.com',
+		databaseURL: 'https://treklog-d28c2.firebaseio.com',
+		projectId: 'treklog-d28c2',
+		storageBucket: 'treklog-d28c2.appspot.com',
+		messagingSenderId: '834453176935'
+	},
 	cesium: {
 		providers: {
 			mapbox: {
@@ -19,6 +21,6 @@ const config = {
 	}
 };
 
-firebase.initializeApp(config);
+firebase.initializeApp(config.firebase);
 
-module.exports = config;
+export default config;

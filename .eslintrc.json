@@ -40,7 +40,7 @@
         ],
         "block-scoped-var": "warn",
         "class-methods-use-this": "warn",
-        "complexity": ["warn", 10],
+        "complexity": ["warn", 20],
         "no-extra-bind": "warn",
         "no-lone-blocks": "warn",
         "no-magic-numbers": ["error", {"ignoreArrayIndexes": true, "ignore": [0,1]}],
@@ -54,6 +54,7 @@
         "no-trailing-spaces": "error",
         "react/prop-types": "off",
         "react/no-find-dom-node": "warn",
-        "react/no-string-refs": "warn"
+		"react/no-string-refs": "warn",
+		"no-console": "warn"
     }
 }

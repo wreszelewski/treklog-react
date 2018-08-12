@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 
 
-import CesiumGlobe from './treklog/CesiumGlobe';
+import TreklogGlobe from './treklog/TreklogGlobe/TreklogGlobe';
+import PlacemarksController from 'treklog/TreklogGlobe/PlacemarksController';
 import AddTrackContainer from './treklog/AddTrackContainer';
 import TrackMenuContainer from './treklog/TrackMenuContainer';
 import TopMenu from './treklog/TopMenu';
@@ -22,14 +23,20 @@ class App extends Component {
 
 			getTracks()
 				.then(tracks => _.keyBy(tracks, 'url'))
-				.then(tracks => loadTrack(this.props.location.pathname, tracks, this.props.actions));
+				.then(tracks => {
+					if(this.props.location.pathname !== this.props.track.url)
+						return loadTrack(this.props.location.pathname, tracks, this.props.actions);
+					return Promise.resolve();
+				});
 		}
 	}
 
 	render() {
 		return (
 			<div>
-				<CesiumGlobe />
+				<TreklogGlobe>
+					<PlacemarksController placemarks={this.props.placemarks} />
+				</TreklogGlobe>
 				<TopMenu />
 				<AddTrackContainer/>
 				<TrackMenuContainer />
@@ -47,7 +54,9 @@ function mapDispatchToProps(dispatch) {
 
 function mapStateToProps(state, ownProps) {
 	return {
-		tracks: state.tracks
+		tracks: state.tracks,
+		placemarks: state.placemarks,
+		track: state.track
 	};
 }
 

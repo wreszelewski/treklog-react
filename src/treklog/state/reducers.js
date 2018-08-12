@@ -1,5 +1,5 @@
 import * as actions from './actions';
-
+import treklogGlobeReducer from 'treklog/TreklogGlobe/reducers';
 import _ from 'lodash';
 
 const initialState = {
@@ -17,7 +17,8 @@ const initialState = {
 		speed: 300,
 		currentTime: 0,
 		newTime: null
-	}
+	},
+	placemarks: []
 };
 
 function reducer(state = initialState, action) {
@@ -99,7 +100,7 @@ function reducer(state = initialState, action) {
 			})
 		});
 	case actions.ANIMATION_PROGRESS_SET_TIME:
-		if (Math.abs(state.animation.currentTime - action.newTime) > minimunDifference) {
+		if (Math.abs(state.animation.currentTime - action.newTime) > minimumDifference) {
 			return Object.assign({}, state, {animation: Object.assign({}, state.animation, {newTime: action.newTime})});
 		} else {
 			return state;
@@ -107,7 +108,7 @@ function reducer(state = initialState, action) {
 	case actions.CESIUM_VIEWER_CREATED:
 		return Object.assign({}, state, {cesiumViewer: action.cesiumViewer});
 	default:
-		return state;
+		return treklogGlobeReducer(state, action);
 	}
 }
 
