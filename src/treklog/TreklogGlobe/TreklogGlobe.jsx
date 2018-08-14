@@ -2,28 +2,19 @@ import React from 'react';
 import ReactQueryParams from 'react-query-params';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import firebase from 'firebase';
-import moment from 'moment';
 
 import Viewer from 'cesium/Source/Widgets/Viewer/Viewer';
 import ProviderViewModel from 'cesium/Source/Widgets/BaseLayerPicker/ProviderViewModel';
 import ArcGisMapServerImageryProvider from 'cesium/Source/Scene/ArcGisMapServerImageryProvider';
 import MapboxImageryProvider from 'cesium/Source/Scene/MapboxImageryProvider';
 import CesiumTerrainProvider from 'cesium/Source/Core/CesiumTerrainProvider';
-import Cartographic from 'cesium/Source/Core/Cartographic';
 import LabelCollection from 'cesium/Source/Scene/LabelCollection';
 import PolylineCollection from 'cesium/Source/Scene/PolylineCollection';
 import Rectangle from 'cesium/Source/Core/Rectangle';
-import HeadingPitchRange from 'cesium/Source/Core/HeadingPitchRange';
 import Color from 'cesium/Source/Core/Color';
-import sampleTerrainMostDetailed from 'cesium/Source/Core/sampleTerrainMostDetailed';
-import GeoJsonDataSource from 'cesium/Source/DataSources/GeoJsonDataSource';
-import CzmlDataSource from 'cesium/Source/DataSources/CzmlDataSource';
 import JulianDate from 'cesium/Source/Core/JulianDate';
 import Camera from 'cesium/Source/Scene/Camera';
 
-import czml from 'treklog/helpers/czml';
-import cameraPosition from 'treklog/helpers/cameraPosition';
 import AnimationController from 'treklog/helpers/AnimationController';
 import * as treklogActions from 'treklog/state/actions';
 import config from 'config';
@@ -31,9 +22,6 @@ import config from 'config';
 import * as actions from './actions';
 
 import 'treklog/styles/CesiumGlobe.css';
-
-const heading = 0;
-const pitch = -1.5707963267948966;
 
 class TreklogGlobe extends ReactQueryParams {
 
@@ -99,106 +87,7 @@ class TreklogGlobe extends ReactQueryParams {
 		this.props.actions.cesiumViewerCreated(this.viewer);
 	}
 
-	registerLiveTrackListener(track) {
-
-		const czmlDataSourceId = 1;
-		const heightOffset = 4;
-		firebase.database().ref('/currentLive').on('value', (snapshot) => {
-			const currentLiveData = snapshot.val();
-			if (currentLiveData.trackUrl === track.url) {
-				if (this.viewer.dataSources.get(czmlDataSourceId)) {
-					const availability = JulianDate.toIso8601(this.viewer.clock.startTime) + '/' + moment(currentLiveData.lastUpdate).toISOString();
-					const pathCarto = [new Cartographic.fromDegrees(currentLiveData.point.latitude, currentLiveData.point.longitude)];
-					sampleTerrainMostDetailed(this.viewer.terrainProvider, pathCarto)
-						.then(altitude => {
-							return this.viewer.dataSources.get(czmlDataSourceId).process({
-								id: 'path',
-								availability: availability,
-								position: {
-									cartographicDegrees: [currentLiveData.lastUpdate, currentLiveData.point.latitude, currentLiveData.point.longitude, altitude[0].height + heightOffset]
-								}
-							});
-						})
-						.then(() => {
-							this.viewer.dataSources.get(czmlDataSourceId).process({
-								id: 'document',
-								clock: {
-									interval: availability,
-									currentTime: JulianDate.toIso8601(this.viewer.clock.currentTime),
-									multiplier: this.viewer.clock.multiplier
-
-								}
-							});
-						}).then(() => {
-							this.viewer.clock.stopTime = JulianDate.fromIso8601(currentLiveData.lastUpdate);
-							this.viewer.clock.shouldAnimate = true;
-						});
-				}
-			} else {
-				firebase.database().ref('/currentLive').off();
-			}
-		});
-	}
-
-	loadTrack(track) {
-		if (track.isLive) {
-			this.registerLiveTrackListener(track);
-		}
-		return this.getCesiumTerrainForGeoJson(track.geoJsonPoints).then((altitudeData) => {
-			track.czmlAltitude = altitudeData;
-			const geoJsonDs = GeoJsonDataSource.load(track.geoJsonPoints, {
-				stroke: Color.fromCssColorString('#f4d797'),
-				strokeWidth: 50,
-				clampToGround: true
-			});
-			const czmlDoc = czml.fromGeoJson(track.geoJsonPoints, track.czmlAltitude);
-			const czmlDs = CzmlDataSource.load(czmlDoc);
-			return Promise.all([geoJsonDs, czmlDs]);
-		}).then(([geoJsonDs, czmlDs]) => {
-			this.viewer.dataSources.removeAll();
-			const addGeoJson = this.viewer.dataSources.add(geoJsonDs);
-			const addCzml = this.viewer.dataSources.add(czmlDs);
-			return Promise.all([addGeoJson, addCzml]);
-		}).then(([addGeoJson, addCzml]) => {
-			addCzml.show = false;
-			this.state.animation.initialize(track);
-			if (track.initialPosition.position) {
-				const destination = cameraPosition.getDestination(track);
-				const orientation = cameraPosition.getOrientation(track);
-
-
-				const range = 20000;
-				return this.viewer.flyTo(addGeoJson, {
-					maxiumumHeight: 20000,
-					duration: 3,
-					offset: new HeadingPitchRange(heading, pitch, range)
-				}).then(() => {
-					return this.viewer.camera.flyTo({
-						destination,
-						orientation,
-						maxiumumHeight: 20000,
-						duration: 3
-					});
-				}).then(() => {
-					this.props.treklogGlobeActions.updatePlacemarks(track.placemarks);
-				});
-			} else {
-				const range = 4000;
-				return this.viewer.flyTo(addGeoJson, { offset: new HeadingPitchRange(heading, pitch, range) });
-			}
-		});
-
-	}
-
-	getCesiumTerrainForGeoJson(geojson) {
-		const pathCartographic = geojson.features[0].geometry.coordinates.map(point => new Cartographic.fromDegrees(point[0], point[1]));
-		return sampleTerrainMostDetailed(this.viewer.terrainProvider, pathCartographic);
-	}
-
 	componentWillReceiveProps(nextProps) {
-		if (this.props.track && this.props.track.url !== nextProps.track.url) {
-			this.loadTrack(nextProps.track);
-		}
 
 		if (this.state.animation) {
 			if (this.state.animation.animationInitialized && nextProps.animation.reset) {

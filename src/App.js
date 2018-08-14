@@ -3,6 +3,8 @@ import React, { Component } from 'react';
 
 import TreklogGlobe from './treklog/TreklogGlobe/TreklogGlobe';
 import PlacemarksController from 'treklog/TreklogGlobe/PlacemarksController';
+import TrackController from 'treklog/TreklogGlobe/TrackController';
+import LiveController from 'treklog/TreklogGlobe/LiveController';
 import AddTrackContainer from './treklog/AddTrackContainer';
 import TrackMenuContainer from './treklog/TrackMenuContainer';
 import TopMenu from './treklog/TopMenu';
@@ -10,7 +12,8 @@ import TreklogLoaderContainer from './treklog/TreklogLoaderContainer';
 import BottomMenuContainer from './treklog/BottomMenuContainer';
 import CesiumAttribution from './treklog/CesiumAttribution';
 import { loadTrack } from './treklog/helpers/trackLoader.js';
-import * as treklogActions from './treklog/state/actions';
+import * as actions from './treklog/state/actions';
+import * as treklogActions from 'treklog/TreklogGlobe/actions';
 import { connect } from 'react-redux';
 import {bindActionCreators} from 'redux';
 import { getTracks } from './treklog/helpers/trackLoader';
@@ -25,7 +28,7 @@ class App extends Component {
 				.then(tracks => _.keyBy(tracks, 'url'))
 				.then(tracks => {
 					if(this.props.location.pathname !== this.props.track.url)
-						return loadTrack(this.props.location.pathname, tracks, this.props.actions);
+						return loadTrack(this.props.location.pathname, tracks, this.props.actions, this.props.treklogActions);
 					return Promise.resolve();
 				});
 		}
@@ -35,6 +38,8 @@ class App extends Component {
 		return (
 			<div>
 				<TreklogGlobe>
+					<TrackController track={this.props.track} />
+					<LiveController track={this.props.track} />
 					<PlacemarksController placemarks={this.props.placemarks} />
 				</TreklogGlobe>
 				<TopMenu />
@@ -49,7 +54,10 @@ class App extends Component {
 }
 
 function mapDispatchToProps(dispatch) {
-	return {actions: bindActionCreators(treklogActions, dispatch)};
+	return {
+		actions: bindActionCreators(actions, dispatch),
+		treklogActions: bindActionCreators(treklogActions, dispatch)
+	};
 }
 
 function mapStateToProps(state, ownProps) {

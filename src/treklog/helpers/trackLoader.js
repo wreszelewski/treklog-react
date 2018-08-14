@@ -5,7 +5,7 @@ export function getTrackLoader(url, tracks, actions) {
 	return () => loadTrack(url, tracks, actions);
 }
 
-export function loadTrack(url, tracks, actions) {
+export function loadTrack(url, tracks, actions, treklogActions) {
 	if(Object.keys(tracks).length === 0) {
 		return null;
 	}
@@ -22,6 +22,7 @@ export function loadTrack(url, tracks, actions) {
 			track.geoJsonPoints = geoJsonPoints;
 			track.originalGeoJsonPoints = originalGeoJsonPoints;
 			actions.fetchTrackFinished(track);
+			treklogActions.updatePlacemarks(track.placemarks);
 			actions.hideTreklogLoader();
 		});
 }
