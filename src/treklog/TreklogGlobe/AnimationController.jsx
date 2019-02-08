@@ -1,3 +1,4 @@
+import {Component} from 'react';
 
 import ClockRange from 'cesium/Source/Core/ClockRange';
 import JulianDate from 'cesium/Source/Core/JulianDate';
@@ -5,18 +6,24 @@ import CMath from 'cesium/Source/Core/Math';
 import Cartesian3 from 'cesium/Source/Core/Cartesian3';
 import Color from 'cesium/Source/Core/Color';
 
-import cameraPosition from './cameraPosition';
-import { getPoints } from './trackLoader';
+import cameraPosition from '../helpers/cameraPosition';
+import { getPoints } from '../helpers/trackLoader';
 
 const geoJsonDataSourceIndex = 0;
 const czmlDataSourceIndex = 1;
 const flyBackTime = 3200;
 const backwardDistance = 3000;
 const backwardStep = 50;
+const msPerSecond = 1000;
 
-export default class AnimationController {
-	constructor(viewer, actions) {
-		this.viewer = viewer;
+export default class AnimationController extends Component {
+	constructor(props) {
+		super(props);
+		this.viewer = this.props.cesiumViewer;
+		this.trackUrl = '';
+		this.playerState = 'STOP';
+		this.playSpeed = 0;
+		this.animationProgressUpdate;
 		this.animationInitialized = false;
 		this.headings = [];
 		this.lastHeading = 0;
@@ -28,8 +35,40 @@ export default class AnimationController {
 		this.initialOrientation = null;
 		this.initialDestination = null;
 		this.secondsDuration = 0;
-		this.actions = actions;
+		this.actions = this.props.callbacks;
 		this.geoJsonPath = null;
+	}
+
+	componentDidUpdate() {
+		this.viewer = this.props.cesiumViewer;
+		this.animationProgressUpdate = this.props.animationUpdateCallback;
+		if(!this.viewer) return;
+		if(this.props.track.url && this.props.track.url !== this.trackUrl) {
+			this.trackUrl = this.props.track.url;
+			this.reset();
+			this.initialize(this.props.track);
+		}
+		if(this.playerState !== this.props.animation.state) {
+			this.playerState = this.props.animation.state;
+			if(this.props.animation.state === 'PLAY') {
+				this.play();
+			} else if (this.props.animation.state === 'PAUSE') {
+				this.pause();
+			} else if (this.props.animation.state === 'STOP') {
+				this.stop();
+			} else if (this.props.animation.state === 'RESET') {
+				this.reset();
+			}
+		}
+
+		if(this.viewer.clock.multiplier !== this.props.animation.speed) {
+			this.setSpeed(this.props.animation.speed);
+		}
+
+		if(this.currentProgress !== this.props.animation.progress) {
+			this.currentProgress = this.props.animation.progress;
+			this.setTimeFromTimeline(this.props.animation.progress);
+		}
 	}
 
 	initialize(track) {
@@ -41,10 +80,9 @@ export default class AnimationController {
 		}
 		this.viewer.clock.clockRange = ClockRange.CLAMPED;
 		this.viewer.clock.shouldAnimate = false;
+		this.viewer.trackedEntity = null;
 		this.viewer.clock.currentTime = this.viewer.clock.startTime;
-		this.secondsDuration = JulianDate.secondsDifference(this.viewer.clock.stopTime, this.viewer.clock.startTime);
-		const dataSource = this.viewer.dataSources.get(czmlDataSourceIndex);
-		this.lastPosition = dataSource.entities.getById('path').position.getValue(this.viewer.clock.currentTime);
+		this.secondsDuration = track.duration / msPerSecond;
 		this.initialDestination = cameraPosition.getDestination(track);
 		this.initialOrientation = cameraPosition.getOrientation(track);
 	}
@@ -60,11 +98,16 @@ export default class AnimationController {
 		this.lastHeading = 0;
 		this.headings = [];
 		this.animationInitialized = false;
+		if(this.animationProgressUpdate) {
+			this.animationProgressUpdate(0);
+		}
 	}
 
 	start(fly = true) {
 		if(!this.animationInitialized) {
 			return Promise.resolve().then(() => {
+				const dataSource = this.viewer.dataSources.get(czmlDataSourceIndex);
+				this.lastPosition = dataSource.entities.getById('path').position.getValue(this.viewer.clock.currentTime);
 				this.viewer.dataSources.get(geoJsonDataSourceIndex).show = false;
 				this.viewer.dataSources.get(czmlDataSourceIndex).show = true;
 				const track = this.viewer.dataSources.get(czmlDataSourceIndex);
@@ -109,7 +152,7 @@ export default class AnimationController {
 		this.reset();
 		if(this.geoJsonPath) {
 			getPoints(this.geoJsonPath).then(trackPoints => {
-				this.viewer.dataSources.get(0).load(trackPoints, {
+				this.viewer.dataSources.get(geoJsonDataSourceIndex).load(trackPoints, {
 					stroke: Color.fromCssColorString('#f4d797'),
 					fill: Color.fromCssColorString('#f4d797'),
 					strokeWidth: 20,
@@ -123,8 +166,6 @@ export default class AnimationController {
 			this.viewer.dataSources.get(czmlDataSourceIndex).show = false;
 			this.viewer.dataSources.get(geoJsonDataSourceIndex).show = true;
 		}
-		this.viewer.trackedEntity = null;
-		this.viewer.clock.currentTime = this.viewer.clock.startTime;
 		if(this.initialDestination && this.initialOrientation) {
 			return this.viewer.camera.flyTo({
 				destination: this.initialDestination,
@@ -137,11 +178,11 @@ export default class AnimationController {
 	}
 
 	setSpeed(value) {
-		this.viewer.clock.multiplier = value;
+		this.viewer.clock.multiplier = parseInt(value);
 	}
 
-	setTimeFromTimeline() {
-		this.start();
+	setTimeFromTimeline(progress) {
+		this.viewer.clock.currentTime = JulianDate.addSeconds(this.viewer.clock.startTime, progress * this.secondsDuration, new JulianDate());
 	}
 
 
@@ -154,8 +195,8 @@ export default class AnimationController {
 		} else {
 			const track = this.viewer.dataSources.get(czmlDataSourceIndex);
 			this._headingRotation(track);
-			const currentTime = this.geoJsonPath ? this.viewer.clock.currentTime : null;
-			this.actions.updateAnimationProgress(JulianDate.secondsDifference(this.viewer.clock.currentTime, this.viewer.clock.startTime), currentTime);
+			if(this.animationProgressUpdate)
+				this.animationProgressUpdate(JulianDate.secondsDifference(this.viewer.clock.currentTime, this.viewer.clock.startTime) / this.secondsDuration);
 		}
 	}
 
@@ -185,6 +226,8 @@ export default class AnimationController {
 			this.lastHeading = headingToApply;
 		}
 	}
+
+	render() { return null; }
 }
 
 function median(values){

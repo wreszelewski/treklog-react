@@ -1,15 +1,20 @@
 import AnimationMenu from './AnimationMenu';
 import { connect } from 'react-redux';
 import {bindActionCreators} from 'redux';
-import * as treklogActions from './state/actions';
+import * as treklogActions from 'treklog/TreklogGlobe/actions';
+import * as actions from 'treklog/state/actions';
+
 
 function mapDispatchToProps(dispatch) {
-	return {actions: bindActionCreators(treklogActions, dispatch)};
+	return {
+		treklogActions: bindActionCreators(treklogActions, dispatch),
+		actions: bindActionCreators(actions, dispatch)
+	};
 }
 
 function mapStateToProps(state) {
 	return {
-		animation: state.animation,
+		animationProgress: state.animationProgress,
 		track: state.track
 	};
 }

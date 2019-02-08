@@ -59,32 +59,8 @@ export function hideTreklogLoader() {
 	return { type: HIDE_TREKLOG_LOADER };
 }
 
-export function animationPlay() {
-	return { type: ANIMATION_PLAY };
-}
-
-export function animationPause() {
-	return { type: ANIMATION_PAUSE };
-}
-
-export function animationStop() {
-	return { type: ANIMATION_STOP };
-}
-
-export function animationReset() {
-	return { type: ANIMATION_RESET };
-}
-
-export function animationSetSpeed(speed) {
-	return { type: ANIMATION_SET_SPEED, speed };
-}
-
-export function updateAnimationProgress(currentRelativeTime, currentTime) {
-	return { type: UPDATE_ANIMATION_PROGRESS, currentRelativeTime, currentTime};
-}
-
-export function animationProgressSetTime(newTime) {
-	return { type: ANIMATION_PROGRESS_SET_TIME, newTime};
+export function updateAnimationProgress(progress) {
+	return { type: UPDATE_ANIMATION_PROGRESS, progress};
 }
 
 export function cesiumViewerCreated(cesiumViewer) {

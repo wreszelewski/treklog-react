@@ -10,19 +10,15 @@ const initialState = {
 	track: {},
 	tracks: {},
 	animation: {
-		shouldPlay: false,
-		shouldReplay: false,
-		shouldBeInitialized: false,
-		reset: false,
-		speed: 300,
-		currentTime: 0,
-		newTime: null
+		state: 'STOP',
+		speed: 1000,
+		progress: 0
 	},
+	animationProgress: 0,
 	placemarks: []
 };
 
 function reducer(state = initialState, action) {
-	const minimumDifference = 2;
 	switch (action.type) {
 	case actions.FETCH_TRACK_STARTED:
 		return Object.assign({}, state, {showLoader: true, showMenu: false, showBottomMenu: false});
@@ -42,71 +38,10 @@ function reducer(state = initialState, action) {
 		return Object.assign({}, state, {showLoader: true});
 	case actions.HIDE_TREKLOG_LOADER:
 		return Object.assign({}, state, {showLoader: false});
-	case actions.ANIMATION_PLAY:
-		return Object.assign({}, state, {
-			animation: {
-				reset: false,
-				shouldPlay: true,
-				shouldReplay: true,
-				shouldBeInitialized: true,
-				speed: state.animation.speed,
-				currentTime: 0
-			}
-		});
-	case actions.ANIMATION_PAUSE:
-		return Object.assign({}, state, {
-			animation: {
-				shouldPlay: false,
-				shouldBeInitialized: true,
-				speed: state.animation.speed,
-				currentTime: 0
-			}
-		});
-	case actions.ANIMATION_STOP:
-		return Object.assign({}, state, {
-			animation: {
-				shouldPlay: false,
-				shouldBeInitialized: false,
-				speed: state.animation.speed,
-				currentTime: 0
-			}
-		});
-	case actions.ANIMATION_RESET:
-		return Object.assign({}, state, {
-			animation: {
-				reset: true,
-				shouldPlay: false,
-				shouldBeInitialized: false,
-				speed: state.animation.speed,
-				currentTime: 0
-			}
-		});
-	case actions.ANIMATION_SET_SPEED:
-		return Object.assign({}, state, {
-			animation: {
-				shouldPlay: state.animation.shouldPlay,
-				shouldBeInitialized: state.animation.shouldBeInitialized,
-				speed: parseInt(action.speed),
-				currentTime: 0
-			}
-		});
-	case actions.UPDATE_ANIMATION_PROGRESS:
-		return Object.assign({}, state, {
-			animation: Object.assign({}, state.animation, {
-				currentTime: action.currentRelativeTime,
-				time: action.currentTime,
-				newTime: null,
-				shouldReplay: false
-			})
-		});
-	case actions.ANIMATION_PROGRESS_SET_TIME:
-		if (Math.abs(state.animation.currentTime - action.newTime) > minimumDifference) {
-			return Object.assign({}, state, {animation: Object.assign({}, state.animation, {newTime: action.newTime})});
-		} else {
-			return state;
-		}
 	case actions.CESIUM_VIEWER_CREATED:
 		return Object.assign({}, state, {cesiumViewer: action.cesiumViewer});
+	case actions.UPDATE_ANIMATION_PROGRESS:
+		return Object.assign({}, state, {animationProgress: action.progress});
 	default:
 		return treklogGlobeReducer(state, action);
 	}

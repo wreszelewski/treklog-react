@@ -18,12 +18,12 @@ import { connect } from 'react-redux';
 import {bindActionCreators} from 'redux';
 import { getTracks } from './treklog/helpers/trackLoader';
 import _ from 'lodash';
+import AnimationController from './treklog/TreklogGlobe/AnimationController';
 
 class App extends Component {
 
-	componentDidUpdate(nextProps) {
-		if(nextProps.location.pathname !== '/') {
-
+	componentDidUpdate() {
+		if(this.props.location.pathname !== '/') {
 			getTracks()
 				.then(tracks => _.keyBy(tracks, 'url'))
 				.then(tracks => {
@@ -41,6 +41,11 @@ class App extends Component {
 					<TrackController track={this.props.track} />
 					<LiveController track={this.props.track} />
 					<PlacemarksController placemarks={this.props.placemarks} />
+					<AnimationController
+						track={this.props.track}
+						animation={this.props.animation}
+						animationUpdateCallback={this.props.actions.updateAnimationProgress}
+					/>
 				</TreklogGlobe>
 				<TopMenu />
 				<AddTrackContainer/>
@@ -61,10 +66,12 @@ function mapDispatchToProps(dispatch) {
 }
 
 function mapStateToProps(state, ownProps) {
+	console.log(state.animation.state);
 	return {
 		tracks: state.tracks,
 		placemarks: state.placemarks,
-		track: state.track
+		track: state.track,
+		animation: state.animation
 	};
 }
 

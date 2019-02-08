@@ -9,10 +9,10 @@ export function loadTrack(url, tracks, actions, treklogActions) {
 	if(Object.keys(tracks).length === 0) {
 		return null;
 	}
-	actions.animationReset();
 	actions.showTreklogLoader();
 	actions.fetchTrackStarted();
 	actions.hideTrackMenu();
+	treklogActions.animationReset();
 	let track = tracks[url];
 	if(!track.originalGeoJsonPath) {
 		track.originalGeoJsonPath = track.geoJsonPath;

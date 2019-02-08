@@ -9,17 +9,33 @@ export default class AnimationMenu extends Component {
 		super();
 		this.state = {
 			speed: 1000,
-			showSettings: false
+			showSettings: false,
+			state: 'STOP',
+			progress: 0
 		};
+		this.play = this.play.bind(this);
+		this.pause = this.pause.bind(this);
+		this.stop = this.stop.bind(this);
 	}
 
 	saveSettings() {
-		this.setState(Object.assign({}, this.state, {showSettings: false}));
-		this.props.actions.animationSetSpeed(this.state.speed);
+		this.setState({showSettings: false});
+		this.props.treklogActions.animationUpdate(this.state.state, this.state.speed, this.state.progress);
 	}
 
-	componentDidMount() {
-		this.props.actions.animationSetSpeed(this.state.speed);
+	play() {
+		this.setState({state: 'PLAY'});
+		this.props.treklogActions.animationUpdate('PLAY', this.state.speed, this.state.progress);
+	}
+
+	pause() {
+		this.setState({state: 'PAUSE'});
+		this.props.treklogActions.animationUpdate('PAUSE', this.state.speed, this.state.progress);
+	}
+
+	stop() {
+		this.setState({state: 'STOP'});
+		this.props.treklogActions.animationUpdate('STOP', this.state.speed, this.state.progress);
 	}
 
 	render() {
@@ -28,13 +44,13 @@ export default class AnimationMenu extends Component {
 			<Segment id="animationMenu" inverted>
 				<div className="movieMenu">
 					<Menu size="mini" inverted icon borderless className="menuButtons">
-						<Menu.Item name='play' onClick={this.props.actions.animationPlay}>
+						<Menu.Item name='play' onClick={this.play}>
 							<Icon name='play' />
 						</Menu.Item>
-						<Menu.Item name='pause' onClick={this.props.actions.animationPause}>
+						<Menu.Item name='pause' onClick={this.pause}>
 							<Icon name='pause' />
 						</Menu.Item>
-						<Menu.Item name='stop' onClick={this.props.actions.animationStop}>
+						<Menu.Item name='stop' onClick={this.stop}>
 							<Icon name='stop' />
 						</Menu.Item>
 						<Dropdown icon="setting" pointing className="bottom left icon item" open={this.state.showSettings} onClick={() => this.setState(Object.assign({}, this.state, {showSettings: true}))}>
@@ -52,7 +68,7 @@ export default class AnimationMenu extends Component {
 							</Dropdown.Menu>
 						</Dropdown>
 					</Menu>
-					<AnimationProgress track={this.props.track} animation={this.props.animation} actions={this.props.actions}/>
+					<AnimationProgress track={this.props.track} progress={this.props.animationProgress} actions={this.props.actions}/>
 				</div>
 			</Segment>
 

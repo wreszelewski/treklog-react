@@ -15,7 +15,6 @@ import Color from 'cesium/Source/Core/Color';
 import JulianDate from 'cesium/Source/Core/JulianDate';
 import Camera from 'cesium/Source/Scene/Camera';
 
-import AnimationController from 'treklog/helpers/AnimationController';
 import * as treklogActions from 'treklog/state/actions';
 import config from 'config';
 
@@ -70,7 +69,6 @@ class TreklogGlobe extends ReactQueryParams {
 				fullscreenButton: false,
 				creditContainer: 'cesiumAttribution'
 			});
-			this.setState({ animation: new AnimationController(this.viewer, this.props.actions, this.state) });
 			this.viewer.scene.globe.baseColor = new Color.fromCssColorString('#ce841c');
 			this.polylines = this.viewer.scene.primitives.add(new PolylineCollection());
 			this.labels = this.viewer.scene.primitives.add(new LabelCollection());
@@ -85,35 +83,6 @@ class TreklogGlobe extends ReactQueryParams {
 
 		this.setState({ viewerLoaded: true });
 		this.props.actions.cesiumViewerCreated(this.viewer);
-	}
-
-	componentWillReceiveProps(nextProps) {
-
-		if (this.state.animation) {
-			if (this.state.animation.animationInitialized && nextProps.animation.reset) {
-				this.state.animation.reset();
-			}
-			if (this.state.animation.animationInitialized && !nextProps.animation.shouldBeInitialized) {
-				this.state.animation.stop();
-			}
-			if (!this.viewer.clock.shouldAnimate && nextProps.animation.shouldPlay && nextProps.animation.shouldReplay) {
-				this.state.animation.play();
-			}
-			if (this.viewer.clock.shouldAnimate && !nextProps.animation.shouldPlay) {
-				this.state.animation.pause();
-			}
-			if (this.viewer.clock.multiplier !== nextProps.animation.speed) {
-				this.state.animation.setSpeed(nextProps.animation.speed);
-
-			}
-
-			if (nextProps.animation.newTime) {
-				this.viewer.clock.currentTime = JulianDate.addSeconds(this.viewer.clock.startTime, nextProps.animation.newTime, new JulianDate());
-			}
-
-
-		}
-
 	}
 
 	componentWillUnmount() {
