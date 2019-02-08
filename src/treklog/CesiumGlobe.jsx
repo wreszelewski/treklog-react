@@ -37,6 +37,8 @@ import ScreenSpaceEventHandler from "cesium/Source/Core/ScreenSpaceEventHandler"
 import ScreenSpaceEventType from "cesium/Source/Core/ScreenSpaceEventType"
 import DistanceDisplayCondition from "cesium/Source/Core/DistanceDisplayCondition"
 import ReactQueryParams from 'react-query-params';
+import Ion from 'cesium/Source/Core/Ion';
+import IonResource from 'cesium/Source/Core/IonResource';
 
 class CesiumGlobe extends ReactQueryParams {
     state = {
@@ -60,7 +62,7 @@ class CesiumGlobe extends ReactQueryParams {
             
             Camera.DEFAULT_VIEW_FACTOR = 0;
             Camera.DEFAULT_VIEW_RECTANGLE = rectangle;
-            
+            Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlMmM2MmM5MS1mZGNhLTRkNzctYjRhMy0zOWM1ZmZiMTJkMzIiLCJpZCI6NzUzNCwic2NvcGVzIjpbImFzciIsImdjIl0sImlhdCI6MTU0OTY1MzA4NX0._D5ndgqqSkliHUz8ZH-NNH4ML1WPhV0yNICqjIzv5w0';
             this.scrollHandler = null;
             this.viewer = new Viewer(this.cesiumContainer, {
                 scene3DOnly: true,
@@ -81,14 +83,11 @@ class CesiumGlobe extends ReactQueryParams {
                 creditContainer: 'cesiumAttribution'
             });
             this.setState({animation: new AnimationController(this.viewer, this.props.actions, this.state)});
-            this.viewer.scene.globe.baseColor = new Color.fromCssColorString('#ce841c'); 
             this.polylines = this.viewer.scene.primitives.add(new PolylineCollection());
             this.labels = this.viewer.scene.primitives.add(new LabelCollection());
             this.viewer.terrainProvider = new CesiumTerrainProvider({
-                url: 'https://assets.agi.com/stk-terrain/world',
-                requestWaterMask: false,
-                requestVertexNormals: false
-            });
+				url: IonResource.fromAssetId(1)
+			})
             this.viewer.clock.shouldAnimate = false;
             this.viewer.scene.globe.depthTestAgainstTerrain = true;
         }
@@ -143,7 +142,7 @@ class CesiumGlobe extends ReactQueryParams {
             track.czmlAltitude = altitudeData;
             const geoJsonDs = GeoJsonDataSource.load(track.geoJsonPoints, {
                 stroke: Color.fromCssColorString('#f4d797'),
-                strokeWidth: 50,
+                strokeWidth: 5,
                 clampToGround: true
             });
             const czmlDoc = czml.fromGeoJson(track.geoJsonPoints, track.czmlAltitude)
@@ -194,7 +193,7 @@ class CesiumGlobe extends ReactQueryParams {
                                     fabric : {
                                         type : 'Color',
                                         uniforms : {
-                                            color : Color.fromCssColorString('#f4d797')
+                                            color : Color.fromCssColorString('#faedd1')
                                         }
                                     }
                                 }),
@@ -205,7 +204,7 @@ class CesiumGlobe extends ReactQueryParams {
                                 text: placemark.name,
                                 font: '20px Lato, sans-serif',
                                 style: LabelStyle.FILL_AND_OUTLINE,
-                                fillColor : Color.fromCssColorString('#f4d797'),
+                                fillColor : Color.fromCssColorString('#faedd1'),
                                 outlineColor : Color.fromCssColorString('#2d200e'),
                                 outlineWidth: 2,
                                 horizontalOrigin: HorizontalOrigin.CENTER,
@@ -321,10 +320,6 @@ class CesiumGlobe extends ReactQueryParams {
                 const provider = new ArcGisMapServerImageryProvider({
                     url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
                 });
-                provider.defaultSaturation = 0.0;
-                provider.defaultAlpha = 0.6;
-                provider.defaultContrast = 2.8;
-                provider.defaultBrightness = 0.8;
                 return provider;
             }
         }));
