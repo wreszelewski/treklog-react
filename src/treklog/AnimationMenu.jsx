@@ -38,6 +38,7 @@ export default class AnimationMenu extends Component {
 	}
 
 	render() {
+		console.log('AnimationMenu render');
 		return (
 
 			<Segment id="animationMenu" inverted>

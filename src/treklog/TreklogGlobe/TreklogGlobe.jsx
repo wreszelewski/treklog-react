@@ -169,19 +169,10 @@ function getImageryProviders(config) {
 	return imageryProviders;
 }
 
-
-const mapStateToProps = (state) => {
-	return {
-		track: state.track,
-		animation: state.animation
-	};
-};
-
 function mapDispatchToProps(dispatch) {
 	return {
-		actions: bindActionCreators(treklogActions, dispatch),
-		treklogGlobeActions: bindActionCreators(actions, dispatch)
+		actions: bindActionCreators(treklogActions, dispatch)
 	};
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(TreklogGlobe);
+export default connect(undefined, mapDispatchToProps)(TreklogGlobe);

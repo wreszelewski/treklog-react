@@ -41,11 +41,7 @@ class App extends Component {
 					<TrackController track={this.props.track} />
 					<LiveController track={this.props.track} />
 					<PlacemarksController placemarks={this.props.placemarks} />
-					<AnimationController
-						track={this.props.track}
-						animation={this.props.animation}
-						animationUpdateCallback={this.props.treklogActions.animationUpdate}
-					/>
+					<AnimationController/>
 				</TreklogGlobe>
 				<TopMenu />
 				<AddTrackContainer/>
@@ -69,8 +65,7 @@ function mapStateToProps(state, ownProps) {
 	return {
 		tracks: state.tracks,
 		placemarks: state.placemarks,
-		track: state.track,
-		animation: state.animation
+		track: state.track
 	};
 }
 

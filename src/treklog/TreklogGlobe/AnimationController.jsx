@@ -6,6 +6,11 @@ import CMath from 'cesium/Source/Core/Math';
 import Cartesian3 from 'cesium/Source/Core/Cartesian3';
 
 import cameraPosition from '../helpers/cameraPosition';
+import * as treklogActions from 'treklog/TreklogGlobe/actions';
+
+
+import { connect } from 'react-redux';
+import {bindActionCreators} from 'redux';
 
 const geoJsonDataSourceIndex = 0;
 const czmlDataSourceIndex = 1;
@@ -14,7 +19,7 @@ const backwardDistance = 3000;
 const backwardStep = 50;
 const msPerSecond = 1000;
 
-export default class AnimationController extends Component {
+class AnimationController extends Component {
 	constructor(props) {
 		super(props);
 		this.viewer = this.props.cesiumViewer;
@@ -35,11 +40,12 @@ export default class AnimationController extends Component {
 		this.secondsDuration = 0;
 		this.actions = this.props.callbacks;
 		this.geoJsonPath = null;
+		this.lastAnimationProgress = 0;
 	}
 
 	componentDidUpdate() {
 		this.viewer = this.props.cesiumViewer;
-		this.animationProgressUpdate = this.props.animationUpdateCallback;
+		this.animationProgressUpdate = this.props.treklogActions.animationUpdate;
 		if(!this.viewer) return;
 		if(this.props.track.url && this.props.track.url !== this.trackUrl) {
 			this.trackUrl = this.props.track.url;
@@ -62,10 +68,11 @@ export default class AnimationController extends Component {
 		if(this.viewer.clock.multiplier !== this.props.animation.speed) {
 			this.setSpeed(this.props.animation.speed);
 		}
-
-		if(this.currentProgress !== this.props.animation.progress) {
-			this.currentProgress = this.props.animation.progress;
-			this.setTimeFromTimeline(this.props.animation.progress);
+		console.log(this.props.animationProgress);
+		if(this.currentProgress !== this.props.animationProgress) {
+			console.log('test');
+			this.currentProgress = this.props.animationProgress;
+			this.setTimeFromTimeline(this.props.animationProgress);
 		}
 	}
 
@@ -182,8 +189,10 @@ export default class AnimationController extends Component {
 		} else {
 			const track = this.viewer.dataSources.get(czmlDataSourceIndex);
 			this._headingRotation(track);
-			if(this.props.animation.state && this.animationProgressUpdate) {
-				this.animationProgressUpdate(undefined, undefined, JulianDate.secondsDifference(this.viewer.clock.currentTime, this.viewer.clock.startTime) / this.secondsDuration);
+			const animationProgress = JulianDate.secondsDifference(this.viewer.clock.currentTime, this.viewer.clock.startTime) / this.secondsDuration;
+			if(this.props.animation.state ==='PLAY' && this.animationProgressUpdate) {
+				this.animationProgressUpdate(undefined, undefined, animationProgress);
+				this.lastAnimationProgress = animationProgress;
 			}
 		}
 	}
@@ -246,3 +255,18 @@ function calculateMovementHeading(track, viewer) {
 	}
 	return null;
 }
+
+function mapDispatchToProps(dispatch) {
+	return {
+		treklogActions: bindActionCreators(treklogActions, dispatch)
+	};
+}
+
+function mapStateToProps(state, ownProps) {
+	return {
+		track: state.track,
+		animation: state.animation
+	};
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(AnimationController);
