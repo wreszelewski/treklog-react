@@ -21,13 +21,13 @@ export default class AnimationProgress extends Component {
 	}
 
 	showMouseLabel(e) {
-		// const percent = this.getAnimationProgress(e);
-		// const secondsSinceStart = percent * (this.props.track.duration / msPerSecond);
-		// const newLabel = formatSeconds(secondsSinceStart);
-		// const lengthScale = 4;
-		// const lengthOffset = 150;
-		// const newPosition = e.pageX - (newLabel.length * lengthScale) - lengthOffset;
-		// this.setState({showMouseLabel: true, leftPosition: newPosition, labelText: newLabel});
+		const percent = this.getAnimationProgress(e);
+		const secondsSinceStart = percent * (this.props.track.duration / msPerSecond);
+		const newLabel = formatSeconds(secondsSinceStart);
+		const lengthScale = 4;
+		const lengthOffset = 150;
+		const newPosition = e.pageX - (newLabel.length * lengthScale) - lengthOffset;
+		this.setState({showMouseLabel: true, leftPosition: newPosition, labelText: newLabel});
 	}
 
 	hideMouseLabel() {
@@ -43,7 +43,7 @@ export default class AnimationProgress extends Component {
 	}
 
 	setTimeFromAnimationProgress(e) {
-		//this.props.actions.animationProgressSetTime(this.getAnimationProgress(e));
+		this.props.actions.updateAnimationProgress(this.getAnimationProgress(e));
 	}
 
 	componentDidMount() {

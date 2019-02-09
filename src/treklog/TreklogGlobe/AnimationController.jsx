@@ -68,9 +68,7 @@ class AnimationController extends Component {
 		if(this.viewer.clock.multiplier !== this.props.animation.speed) {
 			this.setSpeed(this.props.animation.speed);
 		}
-		console.log(this.props.animationProgress);
 		if(this.currentProgress !== this.props.animationProgress) {
-			console.log('test');
 			this.currentProgress = this.props.animationProgress;
 			this.setTimeFromTimeline(this.props.animationProgress);
 		}
@@ -190,7 +188,7 @@ class AnimationController extends Component {
 			const track = this.viewer.dataSources.get(czmlDataSourceIndex);
 			this._headingRotation(track);
 			const animationProgress = JulianDate.secondsDifference(this.viewer.clock.currentTime, this.viewer.clock.startTime) / this.secondsDuration;
-			if(this.props.animation.state ==='PLAY' && this.animationProgressUpdate) {
+			if(this.animationProgressUpdate) {
 				this.animationProgressUpdate(undefined, undefined, animationProgress);
 				this.lastAnimationProgress = animationProgress;
 			}
@@ -265,7 +263,8 @@ function mapDispatchToProps(dispatch) {
 function mapStateToProps(state, ownProps) {
 	return {
 		track: state.track,
-		animation: state.animation
+		animation: state.animation,
+		animationProgress: state.animationProgress
 	};
 }
 
