@@ -13,6 +13,9 @@ const config = {
 		providers: {
 			mapbox: {
 				publicAccessToken: 'pk.eyJ1Ijoid3Jlc3plbGV3c2tpIiwiYSI6ImNqOTNidWgwajN3NzczM3FxbHdhZ3cxZXMifQ.YsXnsIrYCqNRxBYWZyubvw'
+			},
+			ion: {
+				accessToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlMmM2MmM5MS1mZGNhLTRkNzctYjRhMy0zOWM1ZmZiMTJkMzIiLCJpZCI6NzUzNCwic2NvcGVzIjpbImFzciIsImdjIl0sImlhdCI6MTU0OTY1MzA4NX0._D5ndgqqSkliHUz8ZH-NNH4ML1WPhV0yNICqjIzv5w0'
 			}
 		},
 		navigation: {

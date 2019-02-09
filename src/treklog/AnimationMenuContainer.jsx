@@ -14,7 +14,7 @@ function mapDispatchToProps(dispatch) {
 
 function mapStateToProps(state) {
 	return {
-		animationProgress: state.animationProgress,
+		animationProgress: state.animation.progress,
 		track: state.track
 	};
 }

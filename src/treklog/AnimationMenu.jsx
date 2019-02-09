@@ -10,8 +10,7 @@ export default class AnimationMenu extends Component {
 		this.state = {
 			speed: 1000,
 			showSettings: false,
-			state: 'STOP',
-			progress: 0
+			state: 'STOP'
 		};
 		this.play = this.play.bind(this);
 		this.pause = this.pause.bind(this);
@@ -20,22 +19,22 @@ export default class AnimationMenu extends Component {
 
 	saveSettings() {
 		this.setState({showSettings: false});
-		this.props.treklogActions.animationUpdate(this.state.state, this.state.speed, this.state.progress);
+		this.props.treklogActions.animationUpdate(this.state.state, this.state.speed, this.props.animationProgress);
 	}
 
 	play() {
 		this.setState({state: 'PLAY'});
-		this.props.treklogActions.animationUpdate('PLAY', this.state.speed, this.state.progress);
+		this.props.treklogActions.animationUpdate('PLAY', this.state.speed, this.props.animationProgress);
 	}
 
 	pause() {
 		this.setState({state: 'PAUSE'});
-		this.props.treklogActions.animationUpdate('PAUSE', this.state.speed, this.state.progress);
+		this.props.treklogActions.animationUpdate('PAUSE', this.state.speed, this.props.animationProgress);
 	}
 
 	stop() {
 		this.setState({state: 'STOP'});
-		this.props.treklogActions.animationUpdate('STOP', this.state.speed, this.state.progress);
+		this.props.treklogActions.animationUpdate('STOP', this.state.speed, this.props.animationProgress);
 	}
 
 	render() {

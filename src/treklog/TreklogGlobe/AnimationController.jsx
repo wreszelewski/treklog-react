@@ -4,10 +4,8 @@ import ClockRange from 'cesium/Source/Core/ClockRange';
 import JulianDate from 'cesium/Source/Core/JulianDate';
 import CMath from 'cesium/Source/Core/Math';
 import Cartesian3 from 'cesium/Source/Core/Cartesian3';
-import Color from 'cesium/Source/Core/Color';
 
 import cameraPosition from '../helpers/cameraPosition';
-import { getPoints } from '../helpers/trackLoader';
 
 const geoJsonDataSourceIndex = 0;
 const czmlDataSourceIndex = 1;
@@ -97,9 +95,10 @@ export default class AnimationController extends Component {
 		this.angleApplied = 0;
 		this.lastHeading = 0;
 		this.headings = [];
+		this.viewer.trackedEntity = null;
 		this.animationInitialized = false;
 		if(this.animationProgressUpdate) {
-			this.animationProgressUpdate(0);
+			this.animationProgressUpdate(undefined, undefined, 0);
 		}
 	}
 
@@ -150,22 +149,10 @@ export default class AnimationController extends Component {
 
 	stop() {
 		this.reset();
-		if(this.geoJsonPath) {
-			getPoints(this.geoJsonPath).then(trackPoints => {
-				this.viewer.dataSources.get(geoJsonDataSourceIndex).load(trackPoints, {
-					stroke: Color.fromCssColorString('#f4d797'),
-					fill: Color.fromCssColorString('#f4d797'),
-					strokeWidth: 20,
-					clampToGround: true
-				});
-			}).then(() => {
-				this.viewer.dataSources.get(czmlDataSourceIndex).show = false;
-				this.viewer.dataSources.get(geoJsonDataSourceIndex).show = true;
-			});
-		} else {
-			this.viewer.dataSources.get(czmlDataSourceIndex).show = false;
-			this.viewer.dataSources.get(geoJsonDataSourceIndex).show = true;
-		}
+
+		this.viewer.dataSources.get(czmlDataSourceIndex).show = false;
+		this.viewer.dataSources.get(geoJsonDataSourceIndex).show = true;
+
 		if(this.initialDestination && this.initialOrientation) {
 			return this.viewer.camera.flyTo({
 				destination: this.initialDestination,
@@ -195,8 +182,9 @@ export default class AnimationController extends Component {
 		} else {
 			const track = this.viewer.dataSources.get(czmlDataSourceIndex);
 			this._headingRotation(track);
-			if(this.animationProgressUpdate)
-				this.animationProgressUpdate(JulianDate.secondsDifference(this.viewer.clock.currentTime, this.viewer.clock.startTime) / this.secondsDuration);
+			if(this.props.animation.state && this.animationProgressUpdate) {
+				this.animationProgressUpdate(undefined, undefined, JulianDate.secondsDifference(this.viewer.clock.currentTime, this.viewer.clock.startTime) / this.secondsDuration);
+			}
 		}
 	}
 
@@ -239,7 +227,7 @@ function median(values){
 	const two = 2;
 	const twoFloat = 2.0;
 	const one = 1;
-	var half = Math.floor(values.length / two);
+	const half = Math.floor(values.length / two);
 
 	if (values.length % two)
 		return values[half];

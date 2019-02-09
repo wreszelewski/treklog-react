@@ -1,4 +1,5 @@
 import {Component} from 'react';
+import * as Promise from 'bluebird';
 
 import Color from 'cesium/Source/Core/Color';
 import GeoJsonDataSource from 'cesium/Source/DataSources/GeoJsonDataSource';
@@ -38,7 +39,7 @@ export default class TrackController extends Component {
 			track.czmlAltitude = altitudeData;
 			const geoJsonDs = GeoJsonDataSource.load(track.geoJsonPoints, {
 				stroke: Color.fromCssColorString('#f4d797'),
-				strokeWidth: 50,
+				strokeWidth: 5,
 				clampToGround: true
 			});
 			const czmlDoc = czml.fromGeoJson(track.geoJsonPoints, track.czmlAltitude);
@@ -51,7 +52,7 @@ export default class TrackController extends Component {
 			return Promise.all([addGeoJson, addCzml]);
 		}).then(([addGeoJson, addCzml]) => {
 			addCzml.show = false;
-			//this.state.animation.initialize(track);
+
 			if (track.initialPosition.position) {
 				const destination = cameraPosition.getDestination(track);
 				const orientation = cameraPosition.getOrientation(track);
@@ -61,11 +62,14 @@ export default class TrackController extends Component {
 					duration: 3,
 					offset: new HeadingPitchRange(heading, pitch, range)
 				}).then(() => {
-					return this.viewer.camera.flyTo({
-						destination,
-						orientation,
-						maxiumumHeight: 20000,
-						duration: 3
+					const flightDuration = 3000;
+					return Promise.delay(flightDuration).then(() => {
+						this.viewer.camera.flyTo({
+							destination,
+							orientation,
+							maxiumumHeight: 20000,
+							duration: 3
+						});
 					});
 				});
 			} else {

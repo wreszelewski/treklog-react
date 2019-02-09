@@ -11,9 +11,9 @@ import CesiumTerrainProvider from 'cesium/Source/Core/CesiumTerrainProvider';
 import LabelCollection from 'cesium/Source/Scene/LabelCollection';
 import PolylineCollection from 'cesium/Source/Scene/PolylineCollection';
 import Rectangle from 'cesium/Source/Core/Rectangle';
-import Color from 'cesium/Source/Core/Color';
-import JulianDate from 'cesium/Source/Core/JulianDate';
 import Camera from 'cesium/Source/Scene/Camera';
+import Ion from 'cesium/Source/Core/Ion';
+import IonResource from 'cesium/Source/Core/IonResource';
 
 import * as treklogActions from 'treklog/state/actions';
 import config from 'config';
@@ -69,11 +69,11 @@ class TreklogGlobe extends ReactQueryParams {
 				fullscreenButton: false,
 				creditContainer: 'cesiumAttribution'
 			});
-			this.viewer.scene.globe.baseColor = new Color.fromCssColorString('#ce841c');
 			this.polylines = this.viewer.scene.primitives.add(new PolylineCollection());
 			this.labels = this.viewer.scene.primitives.add(new LabelCollection());
+			Ion.defaultAccessToken = config.cesium.providers.ion.accessToken;
 			this.viewer.terrainProvider = new CesiumTerrainProvider({
-				url: 'https://assets.agi.com/stk-terrain/world',
+				url: IonResource.fromAssetId(1),
 				requestWaterMask: false,
 				requestVertexNormals: false
 			});
@@ -136,10 +136,6 @@ function getImageryProviders(config) {
 			const provider = new ArcGisMapServerImageryProvider({
 				url: 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer'
 			});
-			provider.defaultSaturation = 0.0;
-			provider.defaultAlpha = 0.6;
-			provider.defaultContrast = 2.8;
-			provider.defaultBrightness = 0.8;
 			return provider;
 		}
 	}));

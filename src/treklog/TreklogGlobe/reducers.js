@@ -10,7 +10,6 @@ const initialState = {
 };
 
 function reducer(state = initialState, action) {
-	console.log(action.type);
 	switch(action.type) {
 	case actions.PLACEMARKS_UPDATE:
 		return Object.assign({}, state, {placemarks: action.placemarks || []});

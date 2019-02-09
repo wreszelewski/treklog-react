@@ -44,7 +44,7 @@ class App extends Component {
 					<AnimationController
 						track={this.props.track}
 						animation={this.props.animation}
-						animationUpdateCallback={this.props.actions.updateAnimationProgress}
+						animationUpdateCallback={this.props.treklogActions.animationUpdate}
 					/>
 				</TreklogGlobe>
 				<TopMenu />
@@ -66,7 +66,6 @@ function mapDispatchToProps(dispatch) {
 }
 
 function mapStateToProps(state, ownProps) {
-	console.log(state.animation.state);
 	return {
 		tracks: state.tracks,
 		placemarks: state.placemarks,
