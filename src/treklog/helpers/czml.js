@@ -1,5 +1,3 @@
-const moment = require('moment');
-
 const heightOffset = 4;
 const clockMultiplier = 300;
 const lightYellowR = 244;
@@ -84,7 +82,7 @@ function fromGeoJson(geojson, altitude, multiplier = clockMultiplier) {
 
 }
 
-module.exports = {
+export default {
 	createCzmlPath,
 	fromGeoJson
 };

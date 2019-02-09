@@ -18,8 +18,6 @@ import IonResource from 'cesium/Source/Core/IonResource';
 import * as treklogActions from 'treklog/state/actions';
 import config from 'config';
 
-import * as actions from './actions';
-
 import 'treklog/styles/CesiumGlobe.css';
 
 class TreklogGlobe extends ReactQueryParams {

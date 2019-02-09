@@ -20,6 +20,6 @@ function formatSeconds(seconds) {
 	}
 }
 
-module.exports = {
+export default {
 	formatSeconds
 };

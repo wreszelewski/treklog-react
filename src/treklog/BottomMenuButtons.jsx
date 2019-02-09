@@ -86,7 +86,7 @@ export default class BottomMenuButtons extends Component {
 		canvas.width = 900;
 		canvas.height = 472;
 
-		var ctx = canvas.getContext('2d');
+		let ctx = canvas.getContext('2d');
 		const credits = Array.from(document.getElementsByClassName('cesium-credit-text')).reduce((acc, val) => {
 			return acc + (val.innerHTML + '. ');
 		}, '');
@@ -94,7 +94,7 @@ export default class BottomMenuButtons extends Component {
 
 		const creditsRows = this._splitCredits(credits);
 		const svgRowsArr = creditsRows.map(row => '<tspan x="0" dy="1.0em">' + row + '</tspan>');
-		var data = '<svg xmlns="http://www.w3.org/2000/svg" width="' + this.props.cesiumViewer.canvas.width + '" height="200">' +
+		let data = '<svg xmlns="http://www.w3.org/2000/svg" width="' + this.props.cesiumViewer.canvas.width + '" height="200">' +
 		'<style><![CDATA[' +
 		'tspan{font-size:8px;fill:white;font-family:sans-serif;}' +
 		']]></style>' +
@@ -102,9 +102,9 @@ export default class BottomMenuButtons extends Component {
 		svgRowsArr.join('') +
 		'</text>' +
 		'</svg>';
-		var img = new Image();
-		var img2 = new Image();
-		var svg = 'data:image/svg+xml,' + data;
+		let img = new Image();
+		let img2 = new Image();
+		let svg = 'data:image/svg+xml,' + data;
 
 		img.onload = () => {
 			const width = 900;
@@ -159,7 +159,6 @@ export default class BottomMenuButtons extends Component {
 
 	finishLive() {
 		const trackCalc = new TrackCalculator(this.props.track.originalGeoJsonPoints, this.props.track.czmlAltitude);
-		const altitudeStats = trackCalc.altitudeStats;
 		let updates = {};
 		updates['isLive'] = false;
 		updates['geoJsonPoints'] = {};

@@ -1,5 +1,4 @@
 import {Component} from 'react';
-import {bindActionCreators} from 'redux';
 
 import LabelCollection from 'cesium/Source/Scene/LabelCollection';
 import PolylineCollection from 'cesium/Source/Scene/PolylineCollection';
@@ -12,9 +11,6 @@ import Color from 'cesium/Source/Core/Color';
 
 const lineVisibleTo = 20000;
 const labelVisibleTo = 30000;
-const playVisibleTo = 5000;
-const playVisibleFrom = 2000;
-const labelHeight = 100;
 const visibleFrom = 0;
 const placemarkLineExaggeration = 300;
 const placemarkLabelExaggeration = 350;
