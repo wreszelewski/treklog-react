@@ -1,23 +1,24 @@
-import TrackDescription from './TrackDescription';
 import { connect } from 'react-redux';
-import {bindActionCreators} from 'redux';  
-import * as treklogActions from "./state/actions";
+import {bindActionCreators} from 'redux';
+
+import TrackDescription from './TrackDescription';
+import * as treklogActions from './state/actions';
 
 
-const mapStateToProps = (state, ownProps) => {
-    return {
-      active: state.showTrackDescription,
-      track: state.track 
-    }
-  }
+const mapStateToProps = (state) => {
+	return {
+		active: state.showTrackDescription,
+		track: state.track
+	};
+};
 
-  function mapDispatchToProps(dispatch) {  
-    return {actions: bindActionCreators(treklogActions, dispatch)};
+function mapDispatchToProps(dispatch) {
+	return {actions: bindActionCreators(treklogActions, dispatch)};
 }
 
-  const TrackDescriptionContainer = connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )(TrackDescription)
-  
-  export default TrackDescriptionContainer
+const TrackDescriptionContainer = connect(
+	mapStateToProps,
+	mapDispatchToProps
+)(TrackDescription);
+
+export default TrackDescriptionContainer;
