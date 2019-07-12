@@ -1,9 +1,9 @@
-const moment = require('moment');
-const geolib = require('geolib');
-const toGeoJson = require('togeojson');
-const SparkMD5 = require('spark-md5');
-const firebase = require('firebase');
-const slugify = require('slugify');
+import moment from 'moment';
+import geolib from 'geolib';
+import toGeoJson from 'togeojson';
+import SparkMD5 from 'spark-md5';
+import firebase from 'firebase';
+import slugify from 'slugify';
 
 export default class TrackCalculator {
 

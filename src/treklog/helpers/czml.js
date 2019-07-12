@@ -78,11 +78,6 @@ function fromGeoJson(geojson, altitude, multiplier = clockMultiplier) {
 	czml.push(pathObject);
 	return czml;
 
-
-
 }
 
-module.exports = {
-	createCzmlPath,
-	fromGeoJson
-};
+export default {fromGeoJson, createCzmlPath};

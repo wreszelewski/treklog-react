@@ -1,4 +1,4 @@
-const moment = require('moment');
+import moment from 'moment';
 
 const ten = 10;
 
@@ -10,7 +10,7 @@ function twoZeroes(value) {
 	}
 }
 
-function formatSeconds(seconds) {
+export function formatSeconds(seconds) {
 	if(seconds) {
 		const duration = moment.duration(seconds, 'seconds');
 		const secs = duration.seconds();
@@ -19,7 +19,3 @@ function formatSeconds(seconds) {
 		return hours + ':' + twoZeroes(mins) + ':' + twoZeroes(secs) + 'h';
 	}
 }
-
-module.exports = {
-	formatSeconds
-};
