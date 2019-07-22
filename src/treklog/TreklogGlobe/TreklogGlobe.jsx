@@ -1,5 +1,4 @@
-import React from 'react';
-import ReactQueryParams from 'react-query-params';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 
@@ -20,7 +19,7 @@ import config from 'config';
 
 import 'treklog/styles/CesiumGlobe.css';
 
-class TreklogGlobe extends ReactQueryParams {
+class TreklogGlobe extends Component {
 
 	constructor(props) {
 		super(props);
@@ -30,7 +29,7 @@ class TreklogGlobe extends ReactQueryParams {
 			animationInitialized: false,
 			animation: null,
 			animationSpeed: 300,
-			isAdmin: this.queryParams.adm
+			isAdmin: props.isAdmin
 		};
 	}
 

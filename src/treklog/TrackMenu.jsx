@@ -11,7 +11,7 @@ export default class TrackMenu extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			tracks: []
+			tracks: props.tracks
 		};
 		this.handleClose = this.props.actions.hideTrackMenu;
 	}
@@ -25,7 +25,6 @@ export default class TrackMenu extends Component {
 	}
 
 	render() {
-
 		return (
 			<Modal basic size="small" open={this.props.open} onClose={this.handleClose}>
 				<div className="trackMenu content">

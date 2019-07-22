@@ -9,7 +9,8 @@ import './styles/TrackMenu.css';
 
 const mapStateToProps = (state) => {
 	return {
-		open: state.showTrackMenu
+		open: state.showTrackMenu,
+		tracks: state.tracksArr
 	};
 };
 

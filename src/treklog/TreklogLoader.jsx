@@ -7,10 +7,11 @@ export default class TreklogLoader extends Component {
 
 	render() {
 		return (
-
-			<Dimmer className='treklogLoader' active={this.props.active}>
-				<Loader size='massive'>Ładowanie</Loader>
-			</Dimmer>
+			<div id="treklogLoader">
+				<Dimmer className='treklogLoader' active={this.props.active}>
+					<Loader size='massive'>Ładowanie</Loader>
+				</Dimmer>
+			</div>
 
 		);
 	}

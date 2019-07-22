@@ -1,10 +1,34 @@
 import React, { Component } from 'react';
 
+import loadable from '@loadable/component';
 
-import TreklogGlobe from './treklog/TreklogGlobe/TreklogGlobe';
-import PlacemarksController from 'treklog/TreklogGlobe/PlacemarksController';
-import TrackController from 'treklog/TreklogGlobe/TrackController';
-import LiveController from 'treklog/TreklogGlobe/LiveController';
+class EmptyComponent extends Component {
+	render() {
+		return (
+			<div></div>
+		);
+	}
+}
+
+function detectWebGLContext () {
+	var canvas = document.createElement('canvas');
+	var gl = canvas.getContext('webgl')
+      || canvas.getContext('experimental-webgl');
+	if (gl && gl instanceof WebGLRenderingContext) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+const TreklogGlobeComponent = loadable(() => new Promise((resolve, reject) => {
+	if(detectWebGLContext()) {
+		resolve(import('treklog/TreklogGlobe/TreklogGlobeComponent'));
+	} else {
+		resolve(EmptyComponent);
+	}
+}));
+//import TreklogGlobeComponent from './treklog/TreklogGlobe/TreklogGlobeComponent';
 import AddTrackContainer from './treklog/AddTrackContainer';
 import TrackMenuContainer from './treklog/TrackMenuContainer';
 import TopMenu from './treklog/TopMenu';
@@ -18,11 +42,12 @@ import { connect } from 'react-redux';
 import {bindActionCreators} from 'redux';
 import { getTracks } from './treklog/helpers/trackLoader';
 import _ from 'lodash';
-import AnimationController from './treklog/TreklogGlobe/AnimationController';
+import config from 'config';
 
 class App extends Component {
 
 	componentDidUpdate() {
+
 		if(this.props.location.pathname !== '/') {
 			getTracks()
 				.then(tracks => _.keyBy(tracks, 'url'))
@@ -37,13 +62,8 @@ class App extends Component {
 	render() {
 		return (
 			<div>
-				<TreklogGlobe>
-					<TrackController track={this.props.track} />
-					<LiveController track={this.props.track} />
-					<PlacemarksController placemarks={this.props.placemarks} />
-					<AnimationController/>
-				</TreklogGlobe>
-				<TopMenu />
+				<TreklogGlobeComponent track={this.props.track} placemarks={this.props.placemarks} fallback={<div></div>} location={this.props.location}/>
+				<TopMenu location={this.props.location}/>
 				<AddTrackContainer/>
 				<TrackMenuContainer />
 				<BottomMenuContainer />

@@ -1,5 +1,5 @@
 import * as actions from './actions';
-import treklogGlobeReducer from 'treklog/TreklogGlobe/reducers';
+import treklogGlobeReducer from '../TreklogGlobe/reducers';
 import _ from 'lodash';
 
 const initialState = {
@@ -9,6 +9,7 @@ const initialState = {
 	showBottomMenu: false,
 	track: {},
 	tracks: {},
+	tracksArr: [],
 	animation: {
 		state: 'STOP',
 		speed: 1000,
@@ -25,7 +26,7 @@ function reducer(state = initialState, action) {
 	case actions.FETCH_TRACK_FINISHED:
 		return Object.assign({}, state, {track: action.track, showBottomMenu: true});
 	case actions.FETCH_TRACKS_FINISHED:
-		return Object.assign({}, state, {tracks: _.keyBy(action.tracks, 'url')});
+		return Object.assign({}, state, {tracks: _.keyBy(action.tracks, 'url'), tracksArr: action.tracks});
 	case actions.SHOW_ADD_TRACK:
 		return Object.assign({}, state, {showAddTrack: true});
 	case actions.HIDE_ADD_TRACK:

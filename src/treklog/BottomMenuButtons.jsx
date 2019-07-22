@@ -26,7 +26,7 @@ export default class BottomMenuButtons extends Component {
 			pointHeight: 0
 		};
 
-		this.points = this.props.cesiumViewer.scene.primitives.add(new PointPrimitiveCollection());
+
 		this.pointIndex = 0;
 		firebase.auth().onAuthStateChanged(user => {
 			if(user) {
@@ -187,6 +187,7 @@ export default class BottomMenuButtons extends Component {
 	}
 
 	setAddPointMode() {
+		if(!this.points) this.points = this.props.cesiumViewer.scene.primitives.add(new PointPrimitiveCollection());
 		this.pointIndex = 0;
 		const pointPosition = this.props.track.geoJsonPoints.features[0].geometry.coordinates[this.pointIndex];
 		this.setState({

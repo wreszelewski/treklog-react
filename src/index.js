@@ -4,17 +4,15 @@ import { Provider } from 'react-redux';
 import { createStore } from 'redux';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 
-import buildModuleUrl from 'cesium/Source/Core/buildModuleUrl';
-import 'cesium/Source/Widgets/widgets.css';
+
+
 
 import reducer from './treklog/state/reducers';
 import App from './App';
 
 let store = createStore(reducer);
 
-buildModuleUrl.setBaseUrl('/cesium/');
-
-ReactDOM.render(
+ReactDOM.hydrate(
 	<Provider store={store}>
 		<Router>
 			<Route component={App} />

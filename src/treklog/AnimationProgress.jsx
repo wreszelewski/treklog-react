@@ -3,8 +3,6 @@ import { Progress } from 'semantic-ui-react';
 import ReactDOM from 'react-dom';
 import moment from 'moment';
 
-import JulianDate from 'cesium/Source/Core/JulianDate';
-
 import {formatSeconds} from './helpers/time';
 
 const msPerSecond = 1000;
@@ -48,12 +46,6 @@ export default class AnimationProgress extends Component {
 
 	componentDidMount() {
 		ReactDOM.findDOMNode(this.refs['animationProgress']).children[0].children[0].innerHTML = formatSeconds(this.props.progress * this.props.track.duration / msPerSecond) || '';
-	}
-
-	formatTime(time) {
-		if(time) {
-			return 'Ostatnia aktualizacja: ' + moment(JulianDate.toIso8601(time)).calendar();
-		}
 	}
 
 	componentDidUpdate() {

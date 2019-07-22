@@ -1,22 +1,21 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {Button, Icon} from 'semantic-ui-react';
-import ReactQueryParams from 'react-query-params';
 import firebase from 'firebase';
 
 import * as treklogActions from './state/actions';
 
 import './styles/TopMenu.css';
 
-class TopMenu extends ReactQueryParams {
+class TopMenu extends Component {
 
 
 	constructor(props) {
 		super(props);
 		this.state = {
 			isLoggedIn: false,
-			isAdmin: this.queryParams.adm
+			isAdmin: props.location.search === '?adm=1'
 		};
 		firebase.auth().onAuthStateChanged((user) => {
 			if(user) {

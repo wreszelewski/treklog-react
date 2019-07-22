@@ -48,30 +48,23 @@ if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
 // First, read the current file sizes in build directory.
 // This lets us display how much they changed later.
 function makeBuild() {
-  let cesiumDllBuild = Promise.resolve();
-  if(!checkRequiredFiles([paths.cesiumDll])) {
-    const compile = require("./webpackCompile");
+  let ssrBuild = Promise.resolve();
+  const compile = require("./webpackCompile");
+  const ssrConfig = require('../config/webpack.config.server.js');
     
-    
-    const cesiumConfig = require('../config/webpack.cesium.dll.config.js');
-    
-    compile("cesium", cesiumConfig)
-        .then( ({stats}) => {
-    });
-    cesiumDllBuild = compile("cesium", cesiumConfig)
+  ssrBuild = compile("server", ssrConfig)
     .then( ({stats}) => {});
-  }
 
 return measureFileSizesBeforeBuild(paths.appBuild)
   .then(previousFileSizes => {
-    return cesiumDllBuild.then(() => {
+    return ssrBuild.then(() => {
       config = require('../config/webpack.config.prod');      
       // Remove all content but keep the directory so that
       // if you're in it, you don't end up in Trash
       fs.emptyDirSync(paths.appBuild);
       // Merge with the public folder
-      copyPublicFolder();
-      copyCesium();
+	  copyPublicFolder();
+	  copyCesium();
       // Start the webpack build
       return build(previousFileSizes);
     })
@@ -196,10 +189,6 @@ function copyCesium() {
           fs.copySync(fullSrcPath, fullDestPath);
       });
   });
-
-  const cesiumDllPath = path.join(paths.app, "distdll/cesiumDll.js");
-  const cesiumOutputPath = path.join(outputPath, "cesiumDll.js");
-  fs.copySync(cesiumDllPath, cesiumOutputPath);
 
   console.log("Cesium copied to output folder");
 }

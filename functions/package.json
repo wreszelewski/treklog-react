@@ -4,9 +4,10 @@
   "dependencies": {
     "@google-cloud/storage": "^1.6.0",
     "firebase-admin": "^5.13.1",
-    "firebase-functions": "^2.0.2",
+    "firebase-functions": "^3.1.0",
     "moment": "^2.20.1",
     "mustache": "^2.3.0"
   },
-  "private": true
+  "private": true,
+  "engines": { "node": "8" }
 }
