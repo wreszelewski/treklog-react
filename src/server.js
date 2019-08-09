@@ -76,7 +76,7 @@ app.get(
 					showTrackMenu: req.path === '/',
 					showLoader: false
 				};
-				
+
 				function reducer(state = preloadedState, actions) { return state; }
 				let store = createStore(reducer, preloadedState);
 				const jsx = webExtractor.collectChunks(<Provider store={store}>
