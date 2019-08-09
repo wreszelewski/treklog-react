@@ -21,14 +21,6 @@ function detectWebGLContext () {
 	}
 }
 
-const TreklogGlobeComponent = loadable(() => new Promise((resolve, reject) => {
-	if(detectWebGLContext()) {
-		resolve(import('treklog/TreklogGlobe/TreklogGlobeComponent'));
-	} else {
-		resolve(EmptyComponent);
-	}
-}));
-//import TreklogGlobeComponent from './treklog/TreklogGlobe/TreklogGlobeComponent';
 import AddTrackContainer from './treklog/AddTrackContainer';
 import TrackMenuContainer from './treklog/TrackMenuContainer';
 import TopMenu from './treklog/TopMenu';
@@ -46,6 +38,33 @@ import config from 'config';
 
 class App extends Component {
 
+
+	constructor(props) {
+		super(props);
+		this.state = {
+			treklogGlobeComponent: EmptyComponent
+		};
+	}
+
+	loadTreklogGlobe = () => {
+		const TreklogGlobeComponent = loadable(() => new Promise((resolve, reject) => {
+			if(detectWebGLContext()) {
+				resolve(import('treklog/TreklogGlobe/TreklogGlobeComponent'));
+			} else {
+				resolve(EmptyComponent);
+			}
+		}));
+		this.setState(Object.assign({}, this.state, {treklogGlobeComponent: TreklogGlobeComponent}));
+		window.removeEventListener('click', this.loadTreklogGlobe);
+	}
+	componentDidMount() {
+		if(this.props.location.pathname !== '/') {
+			this.loadTreklogGlobe();
+		} else {
+			window.addEventListener('click', this.loadTreklogGlobe);
+		}
+	}
+
 	componentDidUpdate() {
 
 		if(this.props.location.pathname !== '/') {
@@ -62,7 +81,7 @@ class App extends Component {
 	render() {
 		return (
 			<div>
-				<TreklogGlobeComponent track={this.props.track} placemarks={this.props.placemarks} fallback={<div></div>} location={this.props.location}/>
+				<this.state.treklogGlobeComponent track={this.props.track} placemarks={this.props.placemarks} fallback={<div></div>} location={this.props.location}/>
 				<TopMenu location={this.props.location}/>
 				<AddTrackContainer/>
 				<TrackMenuContainer />
