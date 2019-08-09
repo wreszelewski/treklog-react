@@ -41,7 +41,7 @@ import * as treklogActions from 'treklog/TreklogGlobe/actions';
 import { connect } from 'react-redux';
 import {bindActionCreators} from 'redux';
 import { getTracks } from './treklog/helpers/trackLoader';
-import _ from 'lodash';
+import { keyBy } from 'lodash';
 import config from 'config';
 
 class App extends Component {
@@ -50,7 +50,7 @@ class App extends Component {
 
 		if(this.props.location.pathname !== '/') {
 			getTracks()
-				.then(tracks => _.keyBy(tracks, 'url'))
+				.then(tracks => keyBy(tracks, 'url'))
 				.then(tracks => {
 					if(this.props.location.pathname !== this.props.track.url)
 						return loadTrack(this.props.location.pathname, tracks, this.props.actions, this.props.treklogActions);

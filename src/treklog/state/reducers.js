@@ -1,6 +1,6 @@
 import * as actions from './actions';
 import treklogGlobeReducer from '../TreklogGlobe/reducers';
-import _ from 'lodash';
+import { keyBy } from 'lodash';
 
 const initialState = {
 	showLoader: true,
@@ -26,7 +26,7 @@ function reducer(state = initialState, action) {
 	case actions.FETCH_TRACK_FINISHED:
 		return Object.assign({}, state, {track: action.track, showBottomMenu: true});
 	case actions.FETCH_TRACKS_FINISHED:
-		return Object.assign({}, state, {tracks: _.keyBy(action.tracks, 'url'), tracksArr: action.tracks});
+		return Object.assign({}, state, {tracks: keyBy(action.tracks, 'url'), tracksArr: action.tracks});
 	case actions.SHOW_ADD_TRACK:
 		return Object.assign({}, state, {showAddTrack: true});
 	case actions.HIDE_ADD_TRACK:

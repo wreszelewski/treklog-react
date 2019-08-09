@@ -26,6 +26,7 @@ const printHostingInstructions = require('react-dev-utils/printHostingInstructio
 const FileSizeReporter = require('react-dev-utils/FileSizeReporter');
 const printBuildError = require('react-dev-utils/printBuildError');
 const glob = require('glob');
+const babel = require('@babel/core');
 
 const measureFileSizesBeforeBuild =
   FileSizeReporter.measureFileSizesBeforeBuild;
@@ -99,6 +100,8 @@ return measureFileSizesBeforeBuild(paths.appBuild)
       );
       console.log();
 
+	  let transformed = babel.transformFileSync('./functions/lambda.js');
+	  fs.writeFileSync('./functions/lambda_imp.js', transformed.code);
       const appPackage = require(paths.appPackageJson);
       const publicUrl = paths.publicUrl;
       const publicPath = config.output.publicPath;

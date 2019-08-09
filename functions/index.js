@@ -1,5 +1,5 @@
 const functions = require('firebase-functions');
-const admin = require("firebase-admin");
+const admin = require('firebase-admin');
 const gcs = require('@google-cloud/storage')();
 
 admin.initializeApp();
@@ -12,18 +12,19 @@ const geoJsonTemplate = fs.readFileSync(__dirname + '/views/geoJson.mst', {encod
 const moment = require('moment');
 
 const bucketName = 'treklog-d28c2.appspot.com';
+const indexPage = require('./lambda_imp');
 
-exports.indexPage = functions.https.onRequest((req, res) => {
-   const track = admin.database().ref('tracks/' + req.path).once("value")
-    .then(track => track.val())
-    .then(track => {
-        track.distance = (parseInt(track.distance) / 1000).toString();
-        const html = Mustache.render(indexTemplate, track);
-        res.status(200).send(html);
-    });
+// exports.indexPage = functions.https.onRequest((req, res) => {
+//    const track = admin.database().ref('tracks/' + req.path).once("value")
+//     .then(track => track.val())
+//     .then(track => {
+//         track.distance = (parseInt(track.distance) / 1000).toString();
+//         const html = Mustache.render(indexTemplate, track);
+//         res.status(200).send(html);
+//     });
 
-});
-
+// });
+exports.indexPage = functions.https.onRequest(indexPage(admin));
 exports.addLiveTrackPoint = functions.https.onRequest((req, res) => {
     const { deviceId } = req.body;
     return admin.database().ref('currentLive').once("value")

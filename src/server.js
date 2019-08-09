@@ -8,11 +8,11 @@ import { createMemoryHistory } from 'history';
 const history = createMemoryHistory();
 import { Provider } from 'react-redux';
 import { createStore } from 'redux';
-import reducer from './treklog/state/reducers';
+//import reducer from './treklog/state/reducers';
 import { Router, Route } from 'react-router-dom';
 import firebase from 'firebase';
 import config from './config';
-import _ from 'lodash';
+import { keyBy } from 'lodash';
 import moment from 'moment';
 const app = express();
 
@@ -58,12 +58,12 @@ app.get(
 	(req, res) => {
 		const nodeExtractor = new ChunkExtractor({ statsFile: nodeStats });
 		const { default: App } = nodeExtractor.requireEntrypoint();
-		console.log('Have app');
+		console.log(App);
 		const webExtractor = new ChunkExtractor({ statsFile: webStats });
 		console.log('Have web');
 		getTracks()
 			.then(tracks => {
-				return [_.keyBy(tracks, 'url'), tracks];
+				return [keyBy(tracks, 'url'), tracks];
 			})
 			.then(tracks => {
 				let track = req.path === '/' ? {} : tracks[0][req.path];
@@ -76,7 +76,8 @@ app.get(
 					showTrackMenu: req.path === '/',
 					showLoader: false
 				};
-				console.log(preloadedState);
+				
+				function reducer(state = preloadedState, actions) { return state; }
 				let store = createStore(reducer, preloadedState);
 				const jsx = webExtractor.collectChunks(<Provider store={store}>
 					<Router history={history}>

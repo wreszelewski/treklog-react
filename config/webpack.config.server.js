@@ -27,6 +27,7 @@ module.exports = {
 	output: {
 		filename: 'server.js',
 		publicPath: publicPath,
+		path: paths.ssrBuild,
 		libraryTarget: 'commonjs2'
 	},
 	resolve: {

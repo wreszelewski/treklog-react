@@ -12,6 +12,7 @@ functions/node_modules
 distdll/
 /lib
 /dist
+functions/dist
 
 # misc
 .DS_Store
@@ -26,6 +27,7 @@ yarn-error.log*
 functions/package-lock.json
 .vscode/settings.json
 .firebaserc
+.firebase
 firebase-debug.log
 package-lock.json
 package.json
@@ -33,3 +35,4 @@ functions/firebase-debug.log
 functions/tmpTrack.geojson
 curlCommands
 functions/views/index.mst
+functions/lambda_imp.js
