@@ -17,11 +17,13 @@ export default class TrackMenu extends Component {
 	}
 
 	componentDidMount() {
-		getTracks().then((tracks) => {
-			this.setState(Object.assign({}, this.state, { tracks }));
-			this.props.actions.fetchTracksFinished(tracks);
-			this.props.actions.hideTreklogLoader();
-		});
+		if(!this.state.tracks.length || this.state.tracks.length === 0) {
+			getTracks().then((tracks) => {
+				this.setState(Object.assign({}, this.state, { tracks }));
+				this.props.actions.fetchTracksFinished(tracks);
+				this.props.actions.hideTreklogLoader();
+			});
+		}
 	}
 
 	render() {

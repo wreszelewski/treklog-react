@@ -70,7 +70,6 @@ module.exports = (firebase) => (req, res) => {
 			</Provider>);
 
 			const html = renderToString(jsx);
-			console.log(webExtractor.getScriptTags());
 			res.set('content-type', 'text/html');
 			res.set('cache-control', 'public, max-age=3600');
 			res.status(200).send(`<!DOCTYPE html>
