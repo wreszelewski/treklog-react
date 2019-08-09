@@ -1,3 +1,5 @@
+/*eslint-env node */
+
 const React = require('react');
 const { renderToString } = require('react-dom/server');
 const { ChunkExtractor } = require('@loadable/server');
@@ -61,8 +63,8 @@ module.exports = (firebase) => (req, res) => {
 				showTrackMenu: req.path === '/',
 				showLoader: false
 			};
-			
-			let store = createStore((state, action) => state, preloadedState);
+
+			let store = createStore((state) => state, preloadedState);
 			const jsx = webExtractor.collectChunks(<Provider store={store}>
 				<Router history={history}>
 					<Route component={App} />
@@ -72,7 +74,8 @@ module.exports = (firebase) => (req, res) => {
 			const html = renderToString(jsx);
 			res.set('content-type', 'text/html');
 			res.set('cache-control', 'public, max-age=3600');
-			res.status(200).send(`<!DOCTYPE html>
+			const okStatus = 200;
+			res.status(okStatus).send(`<!DOCTYPE html>
 				<html lang="en">
 				<head>
 				<meta http-equiv="X-UA-Compatible" content="IE=Edge">

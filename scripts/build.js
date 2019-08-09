@@ -1,3 +1,5 @@
+/*eslint-env node */
+/* eslint-disable no-console */
 'use strict';
 
 // Do this as the first thing so that any code reading it knows the right env.
@@ -8,7 +10,7 @@ process.env.NODE_ENV = 'production';
 // ignoring them. In the future, promise rejections that are not handled will
 // terminate the Node.js process with a non-zero exit code.
 process.on('unhandledRejection', err => {
-  throw err;
+	throw err;
 });
 
 // Ensure environment variables are read.
@@ -29,19 +31,21 @@ const glob = require('glob');
 const babel = require('@babel/core');
 
 const measureFileSizesBeforeBuild =
-  FileSizeReporter.measureFileSizesBeforeBuild;
+	FileSizeReporter.measureFileSizesBeforeBuild;
 const printFileSizesAfterBuild = FileSizeReporter.printFileSizesAfterBuild;
 const useYarn = fs.existsSync(paths.yarnLockFile);
 
 // These sizes are pretty large. We'll warn for bundles exceeding them.
+/* eslint-disable no-magic-numbers */
 const WARN_AFTER_BUNDLE_GZIP_SIZE = 512 * 1024;
 const WARN_AFTER_CHUNK_GZIP_SIZE = 1024 * 1024;
+/* eslint-enable no-magic-numbers */
 
 let config = {};
 
 // Warn and crash if required files are missing
 if (!checkRequiredFiles([paths.appIndexJs])) {
-  process.exit(1);
+	process.exit(1);
 }
 
 
@@ -49,155 +53,157 @@ if (!checkRequiredFiles([paths.appIndexJs])) {
 // First, read the current file sizes in build directory.
 // This lets us display how much they changed later.
 function makeBuild() {
-  let ssrBuild = Promise.resolve();
-  const compile = require("./webpackCompile");
-  const ssrConfig = require('../config/webpack.config.server.js');
-    
-  ssrBuild = compile("server", ssrConfig)
-    .then( ({stats}) => {});
+	let ssrBuild = Promise.resolve();
+	const compile = require('./webpackCompile');
+	const ssrConfig = require('../config/webpack.config.server.js');
 
-return measureFileSizesBeforeBuild(paths.appBuild)
-  .then(previousFileSizes => {
-    return ssrBuild.then(() => {
-      config = require('../config/webpack.config.prod');      
-      // Remove all content but keep the directory so that
-      // if you're in it, you don't end up in Trash
-      fs.emptyDirSync(paths.appBuild);
-      // Merge with the public folder
-	  copyPublicFolder();
-	  copyCesium();
-      // Start the webpack build
-      return build(previousFileSizes);
-    })
-  })
-  .then(
-    ({ stats, previousFileSizes, warnings }) => {
-      if (warnings.length) {
-        
-        console.log(chalk.yellow('Compiled with warnings.\n'));
-        console.log(warnings.join('\n\n'));
-        console.log(
-          '\nSearch for the ' +
-            chalk.underline(chalk.yellow('keywords')) +
-            ' to learn more about each warning.'
-        );
-        console.log(
-          'To ignore, add ' +
-            chalk.cyan('// eslint-disable-next-line') +
-            ' to the line before.\n'
-        );
-      } else {
-        console.log(chalk.green('Compiled successfully.\n'));
-      }
+	ssrBuild = compile('server', ssrConfig);
 
-      console.log('File sizes after gzip:\n');
-      printFileSizesAfterBuild(
-        stats,
-        previousFileSizes,
-        paths.appBuild,
-        WARN_AFTER_BUNDLE_GZIP_SIZE,
-        WARN_AFTER_CHUNK_GZIP_SIZE
-      );
-      console.log();
+	return measureFileSizesBeforeBuild(paths.appBuild)
+		.then(previousFileSizes => {
+			return ssrBuild.then(() => {
+				config = require('../config/webpack.config.prod');
+				// Remove all content but keep the directory so that
+				// if you're in it, you don't end up in Trash
+				fs.emptyDirSync(paths.appBuild);
+				// Merge with the public folder
+				copyPublicFolder();
+				copyCesium();
+				// Start the webpack build
+				return build(previousFileSizes);
+			});
+		})
+		.then(
+			({
+				stats,
+				previousFileSizes,
+				warnings
+			}) => {
+				if (warnings.length) {
 
-	  let transformed = babel.transformFileSync('./functions/lambda.js');
-	  fs.writeFileSync('./functions/lambda_imp.js', transformed.code);
-      const appPackage = require(paths.appPackageJson);
-      const publicUrl = paths.publicUrl;
-      const publicPath = config.output.publicPath;
-      const buildFolder = path.relative(process.cwd(), paths.appBuild);
-      printHostingInstructions(
-        appPackage,
-        publicUrl,
-        publicPath,
-        buildFolder,
-        useYarn
-      );
-    },
-    err => {
-      console.log(chalk.red('Failed to compile.\n'));
-      printBuildError(err);
-      process.exit(1);
-    }
-  );
+					console.log(chalk.yellow('Compiled with warnings.\n'));
+					console.log(warnings.join('\n\n'));
+					console.log(
+						'\nSearch for the ' +
+						chalk.underline(chalk.yellow('keywords')) +
+						' to learn more about each warning.'
+					);
+					console.log(
+						'To ignore, add ' +
+						chalk.cyan('// eslint-disable-next-line') +
+						' to the line before.\n'
+					);
+				} else {
+					console.log(chalk.green('Compiled successfully.\n'));
+				}
+
+				console.log('File sizes after gzip:\n');
+				printFileSizesAfterBuild(
+					stats,
+					previousFileSizes,
+					paths.appBuild,
+					WARN_AFTER_BUNDLE_GZIP_SIZE,
+					WARN_AFTER_CHUNK_GZIP_SIZE
+				);
+				console.log();
+
+				let transformed = babel.transformFileSync('./functions/lambda.js');
+				fs.writeFileSync('./functions/lambda_imp.js', transformed.code);
+				const appPackage = require(paths.appPackageJson);
+				const publicUrl = paths.publicUrl;
+				const publicPath = config.output.publicPath;
+				const buildFolder = path.relative(process.cwd(), paths.appBuild);
+				printHostingInstructions(
+					appPackage,
+					publicUrl,
+					publicPath,
+					buildFolder,
+					useYarn
+				);
+			},
+			err => {
+				console.log(chalk.red('Failed to compile.\n'));
+				printBuildError(err);
+				process.exit(1);
+			}
+		);
 }
 // Create the production build and print the deployment instructions.
 function build(previousFileSizes) {
-  console.log('Creating an optimized production build...');
-  
-  let compiler = webpack(config);
-  return new Promise((resolve, reject) => {
-    compiler.run((err, stats) => {
-      if (err) {
-        return reject(err);
-      }
-      const messages = formatWebpackMessages(stats.toJson({}, true));
-      if (messages.errors.length) {
-        // Only keep the first error. Others are often indicative
-        // of the same problem, but confuse the reader with noise.
-        if (messages.errors.length > 1) {
-          messages.errors.length = 1;
-        }
-        return reject(new Error(messages.errors.join('\n\n')));
-      }
-      if (
-        process.env.CI &&
-        (typeof process.env.CI !== 'string' ||
-          process.env.CI.toLowerCase() !== 'false') &&
-        messages.warnings.length
-      ) {
-        console.log(
-          chalk.yellow(
-            '\nTreating warnings as errors because process.env.CI = true.\n' +
-              'Most CI servers set it automatically.\n'
-          )
-        );
-        return reject(new Error(messages.warnings.join('\n\n')));
-      }
-      return resolve({
-        stats,
-        previousFileSizes,
-        warnings: messages.warnings,
-      });
-    });
-  });
+	console.log('Creating an optimized production build...');
+
+	let compiler = webpack(config);
+	return new Promise((resolve, reject) => {
+		compiler.run((err, stats) => {
+			if (err) {
+				return reject(err);
+			}
+			const messages = formatWebpackMessages(stats.toJson({}, true));
+			if (messages.errors.length) {
+				// Only keep the first error. Others are often indicative
+				// of the same problem, but confuse the reader with noise.
+				if (messages.errors.length > 1) {
+					messages.errors.length = 1;
+				}
+				return reject(new Error(messages.errors.join('\n\n')));
+			}
+			if (
+				process.env.CI &&
+				(typeof process.env.CI !== 'string' ||
+					process.env.CI.toLowerCase() !== 'false') &&
+				messages.warnings.length
+			) {
+				console.log(
+					chalk.yellow(
+						'\nTreating warnings as errors because process.env.CI = true.\n' +
+						'Most CI servers set it automatically.\n'
+					)
+				);
+				return reject(new Error(messages.warnings.join('\n\n')));
+			}
+			return resolve({
+				stats,
+				previousFileSizes,
+				warnings: messages.warnings
+			});
+		});
+	});
 }
 
 function copyPublicFolder() {
-  fs.copySync(paths.appPublic, paths.appBuild, {
-    dereference: true,
-    filter: file => file !== paths.appHtml,
-  });
+	fs.copySync(paths.appPublic, paths.appBuild, {
+		dereference: true,
+		filter: file => file !== paths.appHtml
+	});
 }
 
 function copyCesium() {
-  const outputPath = path.join(paths.appBuild, "cesium");
-  const inputPath = path.cesiumProdBuild + "/**/*.js";
+	const outputPath = path.join(paths.appBuild, 'cesium');
 
-  let globOptions = {
-      nodir : true,
-      cwd : "node_modules/cesium/Build/Cesium/",
-      ignore: ["*Cesium.js", "**/NaturalEarthII/**/*", "**/maki/**/*"]
-  };
+	let globOptions = {
+		nodir: true,
+		cwd: 'node_modules/cesium/Build/Cesium/',
+		ignore: ['*Cesium.js', '**/NaturalEarthII/**/*', '**/maki/**/*']
+	};
 
-  glob("**/*", globOptions, function (er, files) {
-      // files is an array of filenames.
-      // If the `nonull` option is set, and nothing
-      // was found, then files is ["**/*.js"]
-      // er is an error object or null.
+	glob('**/*', globOptions, function (er, files) {
+		// files is an array of filenames.
+		// If the `nonull` option is set, and nothing
+		// was found, then files is ["**/*.js"]
+		// er is an error object or null.
 
-      files.forEach(function (srcPath) {
-          let fullSrcPath = path.join("node_modules/cesium/Build/Cesium/", srcPath);
-          let fullDestPath = path.join(outputPath, srcPath);
-          fs.copySync(fullSrcPath, fullDestPath);
-      });
-  });
+		files.forEach(function (srcPath) {
+			let fullSrcPath = path.join('node_modules/cesium/Build/Cesium/', srcPath);
+			let fullDestPath = path.join(outputPath, srcPath);
+			fs.copySync(fullSrcPath, fullDestPath);
+		});
+	});
 
-  console.log("Cesium copied to output folder");
+	console.log('Cesium copied to output folder');
 }
 
-if(require.main === module) {
-  makeBuild();
+if (require.main === module) {
+	makeBuild();
 }
 
 module.exports = makeBuild;

@@ -1,3 +1,6 @@
+/*eslint-env node */
+/* eslint-disable no-console */
+
 'use strict';
 
 const path = require('path');
@@ -18,14 +21,10 @@ const LoadablePlugin = require('@loadable/webpack-plugin');
 // Webpack uses `publicPath` to determine where the app is being served from.
 // It requires a trailing slash, or the file assets will get an incorrect path.
 const publicPath = paths.servedPath;
-// Some apps do not use client-side routing with pushState.
-// For these, "homepage" can be set to "." to enable relative asset paths.
-const shouldUseRelativeAssetPaths = publicPath === './';
-// Source maps are resource heavy and can cause out of memory issue for large source files.
-const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== 'false';
 // `publicUrl` is just like `publicPath`, but we will provide it to our app
 // as %PUBLIC_URL% in `index.html` and `process.env.PUBLIC_URL` in JavaScript.
 // Omit trailing slash as %PUBLIC_URL%/xyz looks better than %PUBLIC_URL%xyz.
+// eslint-disable-next-line no-magic-numbers
 const publicUrl = publicPath.slice(0, -1);
 // Get environment variables to inject into our app.
 const env = getClientEnvironment(publicUrl);
@@ -37,17 +36,7 @@ if (env.stringified['process.env'].NODE_ENV !== '"production"') {
 }
 
 // Note: defined here because it will be used more than once.
-const cssFilename = 'static/css/[name].[hash:8].css';
 const jsFilename = 'static/js/[name].[chunkhash:8].js';
-
-// ExtractTextPlugin expects the build output to be flat.
-// (See https://github.com/webpack-contrib/extract-text-webpack-plugin/issues/27)
-// However, our output is structured with css, js and media folders.
-// To have this structure working with relative paths, we have to use custom options.
-const extractTextPluginOptions = shouldUseRelativeAssetPaths
-	? // Making sure that the publicPath goes back to to build folder.
-	{ publicPath: Array(cssFilename.split('/').length).join('../') }
-	: {};
 
 // This is the production configuration.
 // It compiles slowly and is focused on producing a fast and minimal bundle.
@@ -292,6 +281,7 @@ module.exports = {
 		fs: 'empty',
 		net: 'empty',
 		tls: 'empty',
+		// eslint-disable-next-line camelcase
 		child_process: 'empty'
 	}
 };
